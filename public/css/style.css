@@ -1,0 +1,306 @@
+/* Styling dari tag <style> */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.top-nav {
+    background: linear-gradient(to right, #60aee1, #97e58a);
+}
+
+.top-nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.top-nav ul li {
+    position: relative;
+}
+
+.top-nav ul li a {
+    display: flex;
+    align-items: center;
+    padding: 16px 22px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+.top-nav ul li a:hover,
+.top-nav ul li:hover > a {
+    background: #003e7e;
+}
+
+/* Mengatur besar gambar unair rshp yang atas */
+.logo-bar {
+    background: #fff;
+    padding: 16px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+}
+.logo-bar .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+}
+.logo-unair, .logo-rshp {
+    height: 120px; 
+}
+
+/* --- Styling Footer (Dipindahkan dari inline) --- */
+.app-footer {
+    background: linear-gradient(to right, #60aee1, #97e58a);
+    color: #fff;
+    text-align: center;
+    padding: 32px 0;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+    margin-top: 48px;
+}
+.footer-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.footer-text {
+    font-size: 16px;
+    color: #fff;
+    margin-bottom: 18px;
+}
+.footer-copy {
+    font-size: 15px;
+}
+
+/* --- Class untuk Kartu Informasi (Dipindahkan dari inline) --- */
+.content-wrapper {
+    padding: 20px;
+    text-align: center;
+}
+.home-section {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 32px;
+    margin-top: 32px;
+}
+.info-card {
+    background: #f8fafd;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    padding: 28px 32px;
+    max-width: 400px;
+    min-width: 320px;
+}
+.info-title {
+    color: #005baa;
+    margin-top: 0;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: left;
+}
+/* ... Anda dapat terus menambahkan class untuk membersihkan semua inline styling lainnya ... */
+
+/* --- Styling Struktur Organisasi --- */
+.org-section-wrapper {
+    margin-top: 48px;
+    text-align: center;
+}
+.org-list {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+}
+.org-card {
+    background: #f8fafd;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    padding: 24px 20px;
+    width: 260px;
+}
+.org-role {
+    font-weight: bold;
+    color: #005baa;
+    margin-bottom: 8px;
+}
+.org-subtitle {
+    font-size: 0.95em;
+    color: #388e3c;
+    margin-bottom: 8px;
+}
+.org-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 8px;
+}
+.org-name {
+    font-size: 1em;
+    color: #333;
+    margin-top: 8px;
+}
+
+/* --- Styling Layanan Umum --- */
+.service-list {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+}
+.service-card {
+    background: #f8fafd;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    padding: 24px 16px;
+    width: 150px;
+}
+.service-img {
+    width: 70px;
+    height: 66px;
+    margin-bottom: 10px;
+}
+.service-title {
+    font-weight: bold;
+    color: #005baa;
+    margin-top: 8px;
+}
+
+/* --- Styling Lokasi/Maps --- */
+.location-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 36px;
+    margin: 40px 0;
+}
+.map-frame-box {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    padding: 16px;
+}
+.address-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    padding: 32px 28px;
+    min-width: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.address-title {
+    color: #0B2D82;
+    margin-bottom: 12px;
+}
+.address-bold {
+    color: #222;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+.address-text {
+    color: #222;
+    font-size: 16px;
+}
+
+/* --- Styling Visi Misi --- */
+.vm-table-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+}
+.vm-table {
+    background: #f8fafd;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 80%;
+    max-width: 900px;
+}
+.vm-header-visi {
+    background: #60aee1;
+    color: #fff;
+    padding: 16px;
+    font-size: 1.2em;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    text-align: left;
+}
+.vm-header-misi {
+    background: #97e58a;
+    color: #005baa;
+    padding: 16px;
+    font-size: 1.2em;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    text-align: left;
+}
+.vm-content {
+    padding: 20px;
+    color: #222;
+    font-size: 1.05em;
+    text-align: justify;
+}
+.vm-list-title {
+    margin-top: 18px;
+    font-weight: bold;
+    color: #005baa;
+}
+
+/* --- Styling Berita --- */
+.news-header-wrapper {
+    text-align: center;
+    margin-bottom: 24px;
+}
+.news-list {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 48px;
+}
+.news-card {
+    background: #f8fafd;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    width: 320px;
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.news-img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 14px;
+}
+.news-title {
+    font-weight: bold;
+    color: #005baa;
+    font-size: 1.05em;
+    margin-bottom: 8px;
+    text-align: center;
+}
+.news-snippet {
+    color: #444;
+    font-size: 0.97em;
+    margin-bottom: 16px;
+    text-align: center;
+}
+.news-link {
+    background: #60aee1;
+    color: #fff;
+    padding: 10px 0;
+    border-radius: 6px;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+}
+
