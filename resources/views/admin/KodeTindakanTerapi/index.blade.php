@@ -21,7 +21,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($kodeterapi as $kt)
+            @forelse($kodeterapis as $kt)
                 <tr>
                     <td>{{ $kt->idkode_tindakan_terapi }}</td>
                     <td>{{ $kt->kode }}</td>

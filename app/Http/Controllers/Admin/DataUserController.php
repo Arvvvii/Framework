@@ -10,18 +10,14 @@ use Illuminate\Support\Facades\Hash;
 
 class DataUserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+   // Menampilkan daftar DataUser
     public function index()
     {
         $datausers = DataUser::all();
         return view('admin.DataUser.index', compact('datausers'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
         return view('admin.DataUser.create');

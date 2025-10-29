@@ -18,7 +18,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($kategori as $kat)
+            @forelse($kategoris as $kat)
                 <tr>
                     <td>{{ $kat->idkategori }}</td>
                     <td>{{ $kat->nama_kategori }}</td>

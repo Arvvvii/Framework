@@ -21,7 +21,7 @@
         <tbody>
             @forelse($datausers as $datauser)
                 <tr>
-                    <td>{{ $datauser->idDataUser }}</td>
+                    <td>{{ $datauser->iduser }}</td>
                     <td>{{ $datauser->nama }}</td>
                     <td>{{ $datauser->email }}</td>
                 </tr>

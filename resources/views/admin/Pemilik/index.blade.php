@@ -20,7 +20,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($pemilik as $p)
+            @forelse($pemiliks as $p)
                 <tr>
                     <td>{{ $p->idpemilik }}</td>
                     <td>{{ $p->no_wa }}</td>

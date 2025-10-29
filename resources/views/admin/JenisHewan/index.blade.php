@@ -18,7 +18,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($jenhewan as $jh)
+            @forelse($jenishawans as $jh)
                 <tr>
                     <td>{{ $jh->idjenis_hewan }}</td>
                     <td>{{ $jh->nama_jenis_hewan }}</td>

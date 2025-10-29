@@ -17,14 +17,14 @@ class DataUser extends Authenticatable
      *
      * @var string
      */
-    protected $table = 'DataUser';
+    protected $table = 'user';
 
     /**
      * The primary key associated with the table.
      *
      * @var string
      */
-    protected $primaryKey = 'idDataUser';
+    protected $primaryKey = 'iduser';
 
     /**
      * The attributes that are mass assignable.

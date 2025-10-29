@@ -60,14 +60,14 @@ Route::resource('datauser', DataUserController::class)->names([
 ]);
 
 // JenisHewan CRUD Routes
-Route::resource('jenishawan', JenisHewanController::class)->names([
-    'index' => 'admin.jenishawan.index',
-    'create' => 'admin.jenishawan.create',
-    'store' => 'admin.jenishawan.store',
-    'show' => 'admin.jenishawan.show',
-    'edit' => 'admin.jenishawan.edit',
-    'update' => 'admin.jenishawan.update',
-    'destroy' => 'admin.jenishawan.destroy',
+Route::resource('jenishewan', JenisHewanController::class)->names([
+    'index' => 'admin.jenishewan.index',
+    'create' => 'admin.jenishewan.create',
+    'store' => 'admin.jenishewan.store',
+    'show' => 'admin.jenishewan.show',
+    'edit' => 'admin.jenishewan.edit',
+    'update' => 'admin.jenishewan.update',
+    'destroy' => 'admin.jenishewan.destroy',
 ]);
 
 // Kategori CRUD Routes
