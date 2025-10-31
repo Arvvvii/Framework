@@ -13,6 +13,15 @@ use App\Http\Controllers\Admin\KodeTindakanTerapiController;
 use App\Http\Controllers\Admin\PetController;
 use App\Http\Controllers\Admin\RasHewanController;
 use App\Http\Controllers\Admin\PemilikController;
+use App\Http\Controllers\Admin\RekamMedisController;
+use App\Http\Controllers\Perawat\RekamMedisController as PerawatRekamMedisController;
+use App\Http\Controllers\Perawat\TindakanTerapiController;
+use App\Http\Controllers\Dokter\RekamMedisController as DokterRekamMedisController;
+use App\Http\Controllers\Resepsionis\PemilikController as ResepsionisPemilikController;
+use App\Http\Controllers\Resepsionis\PetController as ResepsionisPetController;
+use App\Http\Controllers\Resepsionis\TemuDokterController as ResepsionisTemuDokterController;
+use App\Http\Controllers\Pemilik\PetController as PemilikPetController;
+use App\Http\Controllers\Pemilik\RekamMedisController as PemilikRekamMedisController;
 
 
 /*
@@ -72,18 +81,26 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 Route::middleware(['auth', 'resepsionis'])->group(function () {
     Route::get('/resepsionis/dashboard', [ResepsionisDashboardController::class, 'index'])->name('resepsionis.dashboard');
+    Route::get('/resepsionis/pemilik', [ResepsionisPemilikController::class, 'index'])->name('resepsionis.pemilik.index');
+    Route::get('/resepsionis/pet', [ResepsionisPetController::class, 'index'])->name('resepsionis.pet.index');
+    Route::get('/resepsionis/temudokter', [ResepsionisTemuDokterController::class, 'index'])->name('resepsionis.temudokter.index');
 });
 
 Route::middleware(['auth', 'dokter'])->group(function () {
     Route::get('/dokter/dashboard', [DokterDashboardController::class, 'index'])->name('dokter.dashboard');
+    Route::get('/dokter/rekammedis', [DokterRekamMedisController::class, 'index'])->name('dokter.rekammedis.index');
 });
 
 Route::middleware(['auth', 'pemilik'])->group(function () {
     Route::get('/pemilik/dashboard', [PemilikDashboardController::class, 'index'])->name('pemilik.dashboard');
+    Route::get('/pemilik/pet', [PemilikPetController::class, 'index'])->name('pemilik.pet.index');
+    Route::get('/pemilik/rekammedis', [PemilikRekamMedisController::class, 'index'])->name('pemilik.rekammedis.index');
 });
 
 Route::middleware(['auth', 'perawat'])->group(function () {
     Route::get('/perawat/dashboard', [PerawatDashboardController::class, 'index'])->name('perawat.dashboard');
+    Route::get('/perawat/rekammedis', [PerawatRekamMedisController::class, 'index'])->name('perawat.rekammedis.index');
+    Route::get('/perawat/tindakanterapi', [TindakanTerapiController::class, 'index'])->name('perawat.tindakanterapi.index');
 });
 
 // -- GROUPING SEMUA ROUTE CRUD --
@@ -99,3 +116,4 @@ Route::get('admin/kodeterapi', [KodeTindakanTerapiController::class, 'index'])->
 Route::get('admin/pet', [PetController::class, 'index'])->name('admin.pet.index');
 Route::get('admin/rashewan', [RasHewanController::class, 'index'])->name('admin.rashewan.index');
 Route::get('admin/pemilik', [PemilikController::class, 'index'])->name('admin.pemilik.index');
+Route::get('admin/rekammedis', [RekamMedisController::class, 'index'])->name('admin.rekammedis.index');
