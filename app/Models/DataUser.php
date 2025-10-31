@@ -2,67 +2,47 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Foundation\Auth\User as Authenticatable; 
 use Illuminate\Notifications\Notifiable;
 
-class DataUser extends Authenticatable
+// PENTING: Class harus MENG-EXTEND Authenticatable agar bisa digunakan untuk Login/Auth
+class DataUser extends Authenticatable 
 {
-    /** @use HasFactory<\Database\Factories\DataUserFactory> */
     use HasFactory, Notifiable;
+
+    public $timestamps = false; // Mengabaikan kolom created_at dan updated_at
 
     /**
      * The table associated with the model.
-     *
-     * @var string
+     * PENTING: Jika tabel Anda benar-benar bernama 'datauser', ini sudah benar.
      */
     protected $table = 'user';
 
     /**
      * The primary key associated with the table.
-     *
-     * @var string
      */
-    protected $primaryKey = 'iduser';
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    protected $primaryKey = 'iduser'; // Menggunakan iduser
+    public $incrementing = true; // Menonaktifkan auto-increment jika iduser bukan auto-increment
+    protected $keyType = 'int'; // Tipe data primary key
     protected $fillable = [
         'nama',
         'email',
         'password',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'password'
     ];
 
     /**
      * Get the pemilik associated with the DataUser (One to One).
+     * PERBAIKAN: Menggunakan iduser sebagai foreign key karena Anda menggunakan iduser sebagai primary key.
      */
     public function pemilik()
     {
-        return $this->hasOne(Pemilik::class, 'idDataUser', 'idDataUser');
+        // Asumsi: foreign key di tabel 'pemilik' adalah 'iduser'
+        return $this->hasOne(Pemilik::class, 'iduser', 'iduser');
     }
 
     /**
@@ -70,6 +50,17 @@ class DataUser extends Authenticatable
      */
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'role_DataUser', 'idDataUser', 'idrole');
+        // Asumsi: Pivot table: role_user, foreign key: iduser, related key: idrole
+        return $this->belongsToMany(Role::class, 'role_user', 'iduser', 'idrole');
+    }
+
+    /**
+     * The role_users that belong to the DataUser (One to Many).
+     * PENTING: Relasi ini digunakan untuk Logika Login kustom (roleUser[0]->idrole)
+     */
+    public function roleUsers()
+    {
+        // Asumsi: foreign key di tabel 'role_user' adalah 'iduser'
+        return $this->hasMany(RoleUser::class, 'iduser', 'iduser');
     }
 }

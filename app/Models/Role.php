@@ -9,6 +9,8 @@ class Role extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     /**
      * The table associated with the model.
      *
@@ -37,6 +39,14 @@ class Role extends Model
      */
     public function users()
     {
-        return $this->belongsToMany(User::class, 'role_user', 'idrole', 'iduser');
+        return $this->belongsToMany(DataUser::class, 'role_user', 'idrole', 'iduser');
+    }
+
+    /**
+     * The role_users that belong to the Role (One to Many).
+     */
+    public function roleUsers()
+    {
+        return $this->hasMany(RoleUser::class, 'idrole', 'idrole');
     }
 }

@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-// Impor Controller Anda agar bisa digunakan
+
+// --- Import Semua Controller ---
 use App\Http\Controllers\Site\SiteController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\DataUserController;
@@ -13,125 +14,88 @@ use App\Http\Controllers\Admin\PetController;
 use App\Http\Controllers\Admin\RasHewanController;
 use App\Http\Controllers\Admin\PemilikController;
 
-// Tambahkan route untuk cek koneksi database
+
+/*
+|--------------------------------------------------------------------------
+| A. PUBLIC ROUTES (Routes sebelum Login)
+|--------------------------------------------------------------------------
+| Route yang dapat diakses oleh siapa saja.
+*/
+
+// Route Cek Koneksi (Modul 9)
 Route::get('/cek-koneksi', [SiteController::class, 'cekKoneksi'])->name('cek-koneksi');
 
-// 1. Home Page (Biasanya root '/' diarahkan ke home atau index)
+// Route Home Page Statis (Modul 8/9)
 Route::get('/', [SiteController::class, 'index'])->name('home');
-
-// 2. Struktur Organisasi
 Route::get('/struktur-organisasi', [SiteController::class, 'strukturOrganisasi'])->name('struktur-organisasi');
-
-// 3. Layanan Umum
 Route::get('/layanan-umum', [SiteController::class, 'layananUmum'])->name('layanan-umum');
-
-// 4. Visi Misi dan Tujuan
 Route::get('/visi-misi-tujuan', [SiteController::class, 'visiMisi'])->name('visi-misi-tujuan');
-
-// 5. Berita
 Route::get('/berita', [SiteController::class, 'berita'])->name('berita');
 
-// Route untuk Login (sesuai navigasi native Anda, menuju file terpisah)
-// Jika Anda belum membuat Controller untuk Login, gunakan Closure sementara
-Route::get('/login', function () {
-    return view('login'); // Anggap login.blade.php ada di resources/views/
-})->name('login');
 
-// Role CRUD Routes
-Route::resource('role', RoleController::class)->names([
-    'index' => 'admin.role.index',
-    'create' => 'admin.role.create',
-    'store' => 'admin.role.store',
-    'show' => 'admin.role.show',
-    'edit' => 'admin.role.edit',
-    'update' => 'admin.role.update',
-    'destroy' => 'admin.role.destroy',
-]);
+/*
+|--------------------------------------------------------------------------
+| B. AUTHENTICATION ROUTES
+|--------------------------------------------------------------------------
+| Semua Route Login, Logout, Register, dll., dibuat otomatis di sini.
+*/
 
-// DataUser CRUD Routes
-Route::resource('datauser', DataUserController::class)->names([
-    'index' => 'admin.datauser.index',
-    'create' => 'admin.datauser.create',
-    'store' => 'admin.datauser.store',
-    'show' => 'admin.datauser.show',
-    'edit' => 'admin.datauser.edit',
-    'update' => 'admin.datauser.update',
-    'destroy' => 'admin.datauser.destroy',
-]);
+// Baris ini harus dipanggil di sini, setelah route publik statis
+Auth::routes();
 
-// JenisHewan CRUD Routes
-Route::resource('jenishewan', JenisHewanController::class)->names([
-    'index' => 'admin.jenishewan.index',
-    'create' => 'admin.jenishewan.create',
-    'store' => 'admin.jenishewan.store',
-    'show' => 'admin.jenishewan.show',
-    'edit' => 'admin.jenishewan.edit',
-    'update' => 'admin.jenishewan.update',
-    'destroy' => 'admin.jenishewan.destroy',
-]);
 
-// Kategori CRUD Routes
-Route::resource('kategori', KategoriController::class)->names([
-    'index' => 'admin.kategori.index',
-    'create' => 'admin.kategori.create',
-    'store' => 'admin.kategori.store',
-    'show' => 'admin.kategori.show',
-    'edit' => 'admin.kategori.edit',
-    'update' => 'admin.kategori.update',
-    'destroy' => 'admin.kategori.destroy',
-]);
+// Dashboard Routes for Login Redirections (these are now protected by middleware below)
 
-// KategoriKlinis CRUD Routes
-Route::resource('kategoriklinis', KategoriKlinisController::class)->names([
-    'index' => 'admin.kategoriklinis.index',
-    'create' => 'admin.kategoriklinis.create',
-    'store' => 'admin.kategoriklinis.store',
-    'show' => 'admin.kategoriklinis.show',
-    'edit' => 'admin.kategoriklinis.edit',
-    'update' => 'admin.kategoriklinis.update',
-    'destroy' => 'admin.kategoriklinis.destroy',
-]);
+// Logout Route
+Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 
-// KodeTindakanTerapi CRUD Routes
-Route::resource('kodeterapi', KodeTindakanTerapiController::class)->names([
-    'index' => 'admin.kodeterapi.index',
-    'create' => 'admin.kodeterapi.create',
-    'store' => 'admin.kodeterapi.store',
-    'show' => 'admin.kodeterapi.show',
-    'edit' => 'admin.kodeterapi.edit',
-    'update' => 'admin.kodeterapi.update',
-    'destroy' => 'admin.kodeterapi.destroy',
-]);
 
-// Pet CRUD Routes
-Route::resource('pet', PetController::class)->names([
-    'index' => 'admin.pet.index',
-    'create' => 'admin.pet.create',
-    'store' => 'admin.pet.store',
-    'show' => 'admin.pet.show',
-    'edit' => 'admin.pet.edit',
-    'update' => 'admin.pet.update',
-    'destroy' => 'admin.pet.destroy',
-]);
+/*
+|--------------------------------------------------------------------------
+| C. ADMIN/CRUD ROUTES (Routes yang akan diproteksi Middleware)
+|--------------------------------------------------------------------------
+| Semua route CRUD diletakkan di bawah Auth::routes() dan dikelompokkan
+| agar nanti mudah ditambahkan Middleware.
+*/
 
-// RasHewan CRUD Routes
-Route::resource('rashewan', RasHewanController::class)->names([
-    'index' => 'admin.rashewan.index',
-    'create' => 'admin.rashewan.create',
-    'store' => 'admin.rashewan.store',
-    'show' => 'admin.rashewan.show',
-    'edit' => 'admin.rashewan.edit',
-    'update' => 'admin.rashewan.update',
-    'destroy' => 'admin.rashewan.destroy',
-]);
+// Dashboard Controllers
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Resepsionis\DashboardController as ResepsionisDashboardController;
+use App\Http\Controllers\Dokter\DashboardController as DokterDashboardController;
+use App\Http\Controllers\Pemilik\DashboardController as PemilikDashboardController;
+use App\Http\Controllers\Perawat\DashboardController as PerawatDashboardController;
 
-// Pemilik CRUD Routes
-Route::resource('pemilik', PemilikController::class)->names([
-    'index' => 'admin.pemilik.index',
-    'create' => 'admin.pemilik.create',
-    'store' => 'admin.pemilik.store',
-    'show' => 'admin.pemilik.show',
-    'edit' => 'admin.pemilik.edit',
-    'update' => 'admin.pemilik.update',
-    'destroy' => 'admin.pemilik.destroy',
-]);
+// Protected Dashboard Routes
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+});
+
+Route::middleware(['auth', 'resepsionis'])->group(function () {
+    Route::get('/resepsionis/dashboard', [ResepsionisDashboardController::class, 'index'])->name('resepsionis.dashboard');
+});
+
+Route::middleware(['auth', 'dokter'])->group(function () {
+    Route::get('/dokter/dashboard', [DokterDashboardController::class, 'index'])->name('dokter.dashboard');
+});
+
+Route::middleware(['auth', 'pemilik'])->group(function () {
+    Route::get('/pemilik/dashboard', [PemilikDashboardController::class, 'index'])->name('pemilik.dashboard');
+});
+
+Route::middleware(['auth', 'perawat'])->group(function () {
+    Route::get('/perawat/dashboard', [PerawatDashboardController::class, 'index'])->name('perawat.dashboard');
+});
+
+// -- GROUPING SEMUA ROUTE CRUD --
+// Kita tidak menggunakan Route::resource() di sini agar nanti mudah di-grouping/diberi middleware.
+// Kita hanya menggunakan Route::get() untuk menampilkan data (sesuai tugas C Modul 9: "hanya read saja")
+
+Route::get('admin/role', [RoleController::class, 'index'])->name('admin.role.index');
+Route::get('admin/datauser', [DataUserController::class, 'index'])->name('admin.datauser.index');
+Route::get('admin/jenishewan', [JenisHewanController::class, 'index'])->name('admin.jenishewan.index');
+Route::get('admin/kategori', [KategoriController::class, 'index'])->name('admin.kategori.index');
+Route::get('admin/kategoriklinis', [KategoriKlinisController::class, 'index'])->name('admin.kategoriklinis.index');
+Route::get('admin/kodeterapi', [KodeTindakanTerapiController::class, 'index'])->name('admin.kodeterapi.index');
+Route::get('admin/pet', [PetController::class, 'index'])->name('admin.pet.index');
+Route::get('admin/rashewan', [RasHewanController::class, 'index'])->name('admin.rashewan.index');
+Route::get('admin/pemilik', [PemilikController::class, 'index'])->name('admin.pemilik.index');

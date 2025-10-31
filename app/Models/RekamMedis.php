@@ -33,8 +33,8 @@ class RekamMedis extends Model
         'anamnesa',
         'temuan_klinis',
         'diagnosa',
-        'idpet',
         'dokter_pemeriksa',
+        'idreservasi_dokter',
     ];
 
     /**
@@ -50,11 +50,11 @@ class RekamMedis extends Model
     }
 
     /**
-     * Get the pet that owns the rekam_medis (One to Many).
+     * Get the temu_dokter that owns the rekam_medis (One to Many).
      */
-    public function pet()
+    public function temuDokter()
     {
-        return $this->belongsTo(Pet::class, 'idpet', 'idpet');
+        return $this->belongsTo(TemuDokter::class, 'idreservasi_dokter', 'idreservasi_dokter');
     }
 
     /**

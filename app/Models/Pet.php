@@ -70,6 +70,14 @@ class Pet extends Model
      */
     public function rekamMedis()
     {
-        return $this->hasMany(RekamMedis::class, 'idpet', 'idpet');
+        return $this->hasManyThrough(RekamMedis::class, TemuDokter::class, 'idpet', 'idreservasi_dokter', 'idpet', 'idreservasi_dokter');
+    }
+
+    /**
+     * Get the temu_dokter for the pet (One to Many).
+     */
+    public function temuDokter()
+    {
+        return $this->hasMany(TemuDokter::class, 'idpet', 'idpet');
     }
 }
