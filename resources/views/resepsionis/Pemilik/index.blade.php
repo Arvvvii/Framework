@@ -18,10 +18,12 @@
             @forelse($pemilik as $p)
                 <tr>
                     <td>{{ $p->idpemilik }}</td>
-                    <td>{{ $p->nama }}</td>
+                    {{-- Nama dan Email datang dari relasi DataUser (user) --}}
+                    <td>{{ $p->user->nama ?? '-' }}</td>
                     <td>{{ $p->alamat }}</td>
-                    <td>{{ $p->telepon }}</td>
-                    <td>{{ $p->email }}</td>
+                    {{-- Telepon/WA disimpan di kolom no_wa pada tabel pemilik menurut model --}}
+                    <td>{{ $p->no_wa ?? '-' }}</td>
+                    <td>{{ $p->user->email ?? '-' }}</td>
                 </tr>
             @empty
                 <tr>

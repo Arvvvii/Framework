@@ -13,6 +13,7 @@
                         Berinovasi untuk selalu meningkatkan kualitas pelayanan, maka dari itu Rumah Sakit Hewan Pendidikan Universitas Airlangga mempunyai fitur pendaftaran online yang mempermudah untuk mendaftarkan hewan kesayangan anda.
                     </span>
                 </p>
+                {{-- Guest notice removed --}}
                 <div style="display: flex; flex-direction: column; gap: 12px;">
                     <button style="background: #60aee1; color: #fff; border: none; border-radius: 6px; padding: 12px 0; font-size: 1em; font-weight: bold; cursor: pointer;">
                         Selamat Datang

@@ -52,6 +52,23 @@ Route::get('/berita', [SiteController::class, 'berita'])->name('berita');
 // Baris ini harus dipanggil di sini, setelah route publik statis
 Auth::routes();
 
+// Debug route untuk testing
+Route::get('/debug-perawat', function() {
+    if (!auth()->check()) {
+        return 'Not logged in';
+    }
+    
+    $user = auth()->user();
+    return [
+        'user_id' => $user->iduser ?? 'null',
+        'user_name' => $user->nama ?? 'null',
+        'session_user_role' => session('user_role'),
+        'roleUsers' => $user->roleUsers ? $user->roleUsers->toArray() : 'null',
+        'first_role' => $user->roleUsers[0]->idrole ?? 'null',
+        'role_name' => $user->roleUsers[0]->role->nama_role ?? 'null',
+    ];
+})->middleware('auth');
+
 
 // Dashboard Routes for Login Redirections (these are now protected by middleware below)
 

@@ -18,12 +18,15 @@
         <tbody>
             @forelse($temuDokter as $td)
                 <tr>
-                    <td>{{ $td->idtemu_dokter }}</td>
-                    <td>{{ $td->tanggal ? $td->tanggal->format('d-m-Y') : 'N/A' }}</td>
-                    <td>{{ $td->keluhan }}</td>
+                    <td>{{ $td->idreservasi_dokter ?? $td->idtemu_dokter ?? 'N/A' }}</td>
+                    <td>
+                        {{ $td->waktu_daftar?->format('d-m-Y H:i:s') ?? 'N/A' }}<br>
+                        <small>{{ $td->waktu_daftar?->diffForHumans() }}</small>
+                    </td>
+                    <td>{{ $td->keluhan ?? 'N/A' }}</td>
                     <td>{{ $td->pet->nama ?? 'N/A' }}</td>
-                    <td>{{ $td->pet->pemilik->nama ?? 'N/A' }}</td>
-                    <td>{{ $td->pet->rasHewan->nama_ras ?? 'N/A' }}</td>
+                    <td>{{ optional($td->pet->pemilik->user)->nama ?? 'N/A' }}</td>
+                    <td>{{ optional($td->pet->rasHewan)->nama_ras ?? 'N/A' }}</td>
                 </tr>
             @empty
                 <tr>

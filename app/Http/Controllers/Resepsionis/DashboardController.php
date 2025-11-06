@@ -27,8 +27,8 @@ class DashboardController extends Controller
             'pending_appointments' => 0, // You can customize this based on your appointment system
         ];
 
-        // Get today's registrations
-        $today_registrations = RekamMedis::with(['pet.pemilik'])
+        // Get today's registrations (include related temuDokter -> pet -> pemilik)
+        $today_registrations = RekamMedis::with(['temuDokter.pet.pemilik'])
             ->whereDate('created_at', $today)
             ->orderBy('idrekam_medis', 'desc')
             ->take(10)

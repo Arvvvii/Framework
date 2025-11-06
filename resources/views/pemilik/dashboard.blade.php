@@ -8,7 +8,7 @@
     <h2>Daftar Isi</h2>
     <ul>
         <li><a href="{{ route('pemilik.pet.index') }}">Pet</a></li>
-        <li><a href="{{ route('pemilik.rekam-medis.index') }}">Rekam Medis</a></li>
+    <li><a href="{{ route('pemilik.rekammedis.index') }}">Rekam Medis</a></li>
     </ul>
 </div>
 @endsection

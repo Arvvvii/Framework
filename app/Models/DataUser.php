@@ -17,7 +17,8 @@ class DataUser extends Authenticatable
      * The table associated with the model.
      * PENTING: Jika tabel Anda benar-benar bernama 'datauser', ini sudah benar.
      */
-    protected $table = 'user';
+    // Migration creates table 'datauser' so model should reference it
+    protected $table = 'user'; // ganti ke nama tabel yang sebenarnya di database Anda
 
     /**
      * The primary key associated with the table.

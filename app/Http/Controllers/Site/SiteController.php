@@ -13,6 +13,7 @@ class SiteController extends Controller
      */
     public function index()
     {
+        // Always show the site home view so the homepage layout matches the provided design.
         return view('site.home');
     }
 

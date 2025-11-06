@@ -40,14 +40,11 @@ class Pet extends Model
     /**
      * The attributes that should be cast.
      *
-     * @return array
+     * @var array<string,string>
      */
-    protected function casts(): array
-    {
-        return [
-            'tanggal_lahir' => 'date',
-        ];
-    }
+    protected $casts = [
+        'tanggal_lahir' => 'date',
+    ];
 
     /**
      * Get the pemilik that owns the pet (One to Many).

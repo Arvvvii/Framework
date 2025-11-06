@@ -13,7 +13,8 @@ class PemilikController extends Controller
      */
     public function index()
     {
-        $pemilik = Pemilik::all();
+        // Eager-load related DataUser to access name/email without N+1 queries
+        $pemilik = Pemilik::with('user')->get();
         return view('resepsionis.Pemilik.index', compact('pemilik'));
     }
 }

@@ -39,14 +39,11 @@ class TemuDokter extends Model
     /**
      * The attributes that should be cast.
      *
-     * @return array
+     * @var array<string,string>
      */
-    protected function casts(): array
-    {
-        return [
-            'waktu_daftar' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'waktu_daftar' => 'datetime',
+    ];
 
     /**
      * Get the pet that owns the temu_dokter (One to Many).

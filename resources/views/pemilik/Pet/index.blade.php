@@ -27,11 +27,11 @@
                 <tr>
                     <td>{{ $pet->idpet }}</td>
                     <td>{{ $pet->nama }}</td>
-                    <td>{{ $pet->tanggal_lahir->format('d-m-Y') }}</td>
+                    <td>{{ optional($pet->tanggal_lahir)->format('d-m-Y') ?? 'N/A' }}</td>
                     <td>{{ $pet->warna_tanda }}</td>
                     <td>{{ $pet->jenis_kelamin }}</td>
-                    <td>{{ $pet->idpemilik ?? 'N/A' }}</td>
-                    <td>{{ $pet->idras_hewan ?? 'N/A' }}</td>
+                    <td>{{ optional($pet->pemilik->user)->nama ?? 'N/A' }}</td>
+                    <td>{{ optional($pet->rasHewan)->nama_ras ?? 'N/A' }}</td>
                 </tr>
             @empty
                 <tr>

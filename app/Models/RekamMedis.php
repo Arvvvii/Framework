@@ -9,6 +9,9 @@ class RekamMedis extends Model
 {
     use HasFactory;
 
+    // Hapus atau comment line ini untuk mengaktifkan timestamps
+    // public $timestamps = false;
+    
     /**
      * The table associated with the model.
      *
@@ -29,7 +32,6 @@ class RekamMedis extends Model
      * @var array
      */
     protected $fillable = [
-        'created_at',
         'anamnesa',
         'temuan_klinis',
         'diagnosa',
@@ -40,14 +42,12 @@ class RekamMedis extends Model
     /**
      * The attributes that should be cast.
      *
-     * @return array
+     * @var array<string,string>
      */
-    protected function casts(): array
-    {
-        return [
-            'created_at' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
     /**
      * Get the temu_dokter that owns the rekam_medis (One to Many).

@@ -37,11 +37,18 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
+    public function hasRole($role)
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        // Sesuaikan dengan struktur database Anda
+        // Contoh jika menggunakan relasi ke table roles
+        return $this->role && $this->role->nama_role === $role;
+        
+        // Atau jika menggunakan field langsung di table users
+        // return $this->role === $role;
     }
 }

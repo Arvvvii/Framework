@@ -22,13 +22,16 @@
             @forelse($rekamMedis as $rm)
                 <tr>
                     <td>{{ $rm->idrekam_medis }}</td>
-                    <td>{{ $rm->created_at ? $rm->created_at->format('d-m-Y') : 'N/A' }}</td>
+                    <td>
+                        {{ $rm->created_at?->format('d-m-Y H:i:s') ?? 'N/A' }}
+                        <br><small>{{ $rm->created_at?->diffForHumans() }}</small>
+                    </td>
                     <td>{{ $rm->anamnesa }}</td>
                     <td>{{ $rm->temuan_klinis }}</td>
                     <td>{{ $rm->diagnosa }}</td>
                     <td>{{ $rm->roleUser->user->nama ?? 'N/A' }}</td>
                     <td>{{ $rm->temuDokter->pet->nama ?? 'N/A' }}</td>
-                    <td>{{ $rm->temuDokter->pet->pemilik->nama ?? 'N/A' }}</td>
+                    <td>{{ optional($rm->temuDokter->pet->pemilik->user)->nama ?? 'N/A' }}</td>
                     <td>{{ $rm->temuDokter->pet->rasHewan->nama_ras ?? 'N/A' }}</td>
                 </tr>
             @empty
