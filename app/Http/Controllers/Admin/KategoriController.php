@@ -31,19 +31,11 @@ class KategoriController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'nama_kategori' => 'required|string|max:255|unique:kategori,nama_kategori',
-        ]);
+        $validated = $this->validateKategori($request);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
+        $this->createKategori($validated);
 
-        Kategori::create($request->only(['nama_kategori']));
-
-        return redirect()->route('admin.kategori.index')->with('success', 'Kategori created successfully.');
+        return redirect()->route('admin.kategori.index')->with('success', 'Kategori berhasil ditambahkan.');
     }
 
     /**
@@ -67,19 +59,13 @@ class KategoriController extends Controller
      */
     public function update(Request $request, Kategori $kategori)
     {
-        $validator = Validator::make($request->all(), [
-            'nama_kategori' => 'required|string|max:255|unique:kategori,nama_kategori,' . $kategori->idkategori . ',idkategori',
+        $validated = $this->validateKategori($request, $kategori->idkategori);
+
+        $kategori->update([
+            'nama_kategori' => $this->formatNamaKategori($validated['nama_kategori']),
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        $kategori->update($request->only(['nama_kategori']));
-
-        return redirect()->route('admin.kategori.index')->with('success', 'Kategori updated successfully.');
+        return redirect()->route('admin.kategori.index')->with('success', 'Kategori berhasil diperbarui.');
     }
 
     /**
@@ -90,5 +76,43 @@ class KategoriController extends Controller
         $kategori->delete();
 
         return redirect()->route('admin.kategori.index')->with('success', 'Kategori deleted successfully.');
+    }
+
+    /**
+     * Validation helper for Kategori
+     */
+    protected function validateKategori(Request $request, $id = null)
+    {
+        $uniqueRule = $id
+            ? 'unique:kategori,nama_kategori,' . $id . ',idkategori'
+            : 'unique:kategori,nama_kategori';
+
+        return $request->validate([
+            'nama_kategori' => ['required', 'string', 'min:3', 'max:255', $uniqueRule],
+        ], [
+            'nama_kategori.required' => 'Nama kategori wajib diisi.',
+            'nama_kategori.string' => 'Nama kategori harus berupa teks.',
+            'nama_kategori.min' => 'Nama kategori minimal 3 karakter.',
+            'nama_kategori.max' => 'Nama kategori maksimal 255 karakter.',
+            'nama_kategori.unique' => 'Nama kategori sudah terdaftar.',
+        ]);
+    }
+
+    /**
+     * Create helper for Kategori
+     */
+    protected function createKategori(array $data)
+    {
+        return Kategori::create([
+            'nama_kategori' => $this->formatNamaKategori($data['nama_kategori']),
+        ]);
+    }
+
+    /**
+     * Format helper for Kategori
+     */
+    protected function formatNamaKategori(string $nama)
+    {
+        return trim(ucwords(strtolower($nama)));
     }
 }

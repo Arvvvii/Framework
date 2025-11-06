@@ -91,9 +91,27 @@ use App\Http\Controllers\Dokter\DashboardController as DokterDashboardController
 use App\Http\Controllers\Pemilik\DashboardController as PemilikDashboardController;
 use App\Http\Controllers\Perawat\DashboardController as PerawatDashboardController;
 
-// Protected Dashboard Routes
+// Protected Admin Routes (dashboard + CRUD) - grouped and protected by auth + admin middleware
 Route::middleware(['auth', 'admin'])->group(function () {
+    // Admin Dashboard
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+
+    // -- GROUPING SEMUA ROUTE CRUD (Admin) --
+    Route::get('admin/role', [RoleController::class, 'index'])->name('admin.role.index');
+    Route::get('admin/datauser', [DataUserController::class, 'index'])->name('admin.datauser.index');
+    Route::get('admin/jenishewan', [JenisHewanController::class, 'index'])->name('admin.jenishewan.index');
+    Route::get('admin/jenishewan/create', [JenisHewanController::class, 'create'])->name('admin.jenishewan.create');
+    Route::post('admin/jenishewan', [JenisHewanController::class, 'store'])->name('admin.jenishewan.store');
+    Route::get('admin/jenishewan/{jenishawan}/edit', [JenisHewanController::class, 'edit'])->name('admin.jenishewan.edit');
+    Route::put('admin/jenishewan/{jenishawan}', [JenisHewanController::class, 'update'])->name('admin.jenishewan.update');
+    Route::delete('admin/jenishewan/{jenishawan}', [JenisHewanController::class, 'destroy'])->name('admin.jenishewan.destroy');
+    Route::get('admin/kategori', [KategoriController::class, 'index'])->name('admin.kategori.index');
+    Route::get('admin/kategoriklinis', [KategoriKlinisController::class, 'index'])->name('admin.kategoriklinis.index');
+    Route::get('admin/kodeterapi', [KodeTindakanTerapiController::class, 'index'])->name('admin.kodeterapi.index');
+    Route::get('admin/pet', [PetController::class, 'index'])->name('admin.pet.index');
+    Route::get('admin/rashewan', [RasHewanController::class, 'index'])->name('admin.rashewan.index');
+    Route::get('admin/pemilik', [PemilikController::class, 'index'])->name('admin.pemilik.index');
+    Route::get('admin/rekammedis', [RekamMedisController::class, 'index'])->name('admin.rekammedis.index');
 });
 
 Route::middleware(['auth', 'resepsionis'])->group(function () {
@@ -120,17 +138,4 @@ Route::middleware(['auth', 'perawat'])->group(function () {
     Route::get('/perawat/tindakanterapi', [TindakanTerapiController::class, 'index'])->name('perawat.tindakanterapi.index');
 });
 
-// -- GROUPING SEMUA ROUTE CRUD --
-// Kita tidak menggunakan Route::resource() di sini agar nanti mudah di-grouping/diberi middleware.
-// Kita hanya menggunakan Route::get() untuk menampilkan data (sesuai tugas C Modul 9: "hanya read saja")
-
-Route::get('admin/role', [RoleController::class, 'index'])->name('admin.role.index');
-Route::get('admin/datauser', [DataUserController::class, 'index'])->name('admin.datauser.index');
-Route::get('admin/jenishewan', [JenisHewanController::class, 'index'])->name('admin.jenishewan.index');
-Route::get('admin/kategori', [KategoriController::class, 'index'])->name('admin.kategori.index');
-Route::get('admin/kategoriklinis', [KategoriKlinisController::class, 'index'])->name('admin.kategoriklinis.index');
-Route::get('admin/kodeterapi', [KodeTindakanTerapiController::class, 'index'])->name('admin.kodeterapi.index');
-Route::get('admin/pet', [PetController::class, 'index'])->name('admin.pet.index');
-Route::get('admin/rashewan', [RasHewanController::class, 'index'])->name('admin.rashewan.index');
-Route::get('admin/pemilik', [PemilikController::class, 'index'])->name('admin.pemilik.index');
-Route::get('admin/rekammedis', [RekamMedisController::class, 'index'])->name('admin.rekammedis.index');
+// (moved into admin middleware group above)

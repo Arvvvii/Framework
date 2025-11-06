@@ -35,22 +35,11 @@ class KodeTindakanTerapiController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'kode' => 'required|string|max:255|unique:kode_tindakan_terapi,kode',
-            'deskripsi_tindakan_terapi' => 'required|string|max:255',
-            'idkategori' => 'required|exists:kategori,idkategori',
-            'idkategori_klinis' => 'required|exists:kategori_klinis,idkategori_klinis',
-        ]);
+        $validated = $this->validateKodeTindakanTerapi($request);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
+        $this->createKodeTindakanTerapi($validated);
 
-        KodeTindakanTerapi::create($request->only(['kode', 'deskripsi_tindakan_terapi', 'idkategori', 'idkategori_klinis']));
-
-        return redirect()->route('admin.kodeterapi.index')->with('success', 'KodeTindakanTerapi created successfully.');
+        return redirect()->route('admin.kodeterapi.index')->with('success', 'Kode terapi berhasil ditambahkan.');
     }
 
     /**
@@ -77,22 +66,16 @@ class KodeTindakanTerapiController extends Controller
      */
     public function update(Request $request, KodeTindakanTerapi $kodeterapi)
     {
-        $validator = Validator::make($request->all(), [
-            'kode' => 'required|string|max:255|unique:kode_tindakan_terapi,kode,' . $kodeterapi->idkode_tindakan_terapi . ',idkode_tindakan_terapi',
-            'deskripsi_tindakan_terapi' => 'required|string|max:255',
-            'idkategori' => 'required|exists:kategori,idkategori',
-            'idkategori_klinis' => 'required|exists:kategori_klinis,idkategori_klinis',
+        $validated = $this->validateKodeTindakanTerapi($request, $kodeterapi->idkode_tindakan_terapi);
+
+        $kodeterapi->update([
+            'kode' => $validated['kode'],
+            'deskripsi_tindakan_terapi' => $validated['deskripsi_tindakan_terapi'],
+            'idkategori' => $validated['idkategori'],
+            'idkategori_klinis' => $validated['idkategori_klinis'],
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        $kodeterapi->update($request->only(['kode', 'deskripsi_tindakan_terapi', 'idkategori', 'idkategori_klinis']));
-
-        return redirect()->route('admin.kodeterapi.index')->with('success', 'KodeTindakanTerapi updated successfully.');
+        return redirect()->route('admin.kodeterapi.index')->with('success', 'Kode terapi berhasil diperbarui.');
     }
 
     /**
@@ -103,5 +86,45 @@ class KodeTindakanTerapiController extends Controller
         $kodeterapi->delete();
 
         return redirect()->route('admin.kodeterapi.index')->with('success', 'KodeTindakanTerapi deleted successfully.');
+    }
+
+    /**
+     * Validation helper for Kode Tindakan Terapi
+     */
+    protected function validateKodeTindakanTerapi(Request $request, $id = null)
+    {
+        $uniqueRule = $id
+            ? 'unique:kode_tindakan_terapi,kode,' . $id . ',idkode_tindakan_terapi'
+            : 'unique:kode_tindakan_terapi,kode';
+
+        return $request->validate([
+            'kode' => ['required', 'string', 'min:1', 'max:255', $uniqueRule],
+            'deskripsi_tindakan_terapi' => ['required', 'string', 'max:255'],
+            'idkategori' => ['required', 'exists:kategori,idkategori'],
+            'idkategori_klinis' => ['required', 'exists:kategori_klinis,idkategori_klinis'],
+        ], [
+            'kode.required' => 'Kode terapi wajib diisi.',
+            'kode.string' => 'Kode terapi harus berupa teks.',
+            'kode.max' => 'Kode terapi maksimal 255 karakter.',
+            'kode.unique' => 'Kode terapi sudah terdaftar.',
+            'deskripsi_tindakan_terapi.required' => 'Deskripsi wajib diisi.',
+            'idkategori.required' => 'Kategori wajib dipilih.',
+            'idkategori.exists' => 'Kategori tidak ditemukan.',
+            'idkategori_klinis.required' => 'Kategori klinis wajib dipilih.',
+            'idkategori_klinis.exists' => 'Kategori klinis tidak ditemukan.',
+        ]);
+    }
+
+    /**
+     * Create helper for Kode Tindakan Terapi
+     */
+    protected function createKodeTindakanTerapi(array $data)
+    {
+        return KodeTindakanTerapi::create([
+            'kode' => $data['kode'],
+            'deskripsi_tindakan_terapi' => $data['deskripsi_tindakan_terapi'],
+            'idkategori' => $data['idkategori'],
+            'idkategori_klinis' => $data['idkategori_klinis'],
+        ]);
     }
 }

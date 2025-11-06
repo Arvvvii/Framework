@@ -28,25 +28,11 @@ class DataUserController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'nama' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:DataUser,email',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+        $validated = $this->validateDataUser($request);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
+        $this->createDataUser($validated);
 
-        DataUser::create([
-            'nama' => $request->nama,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        return redirect()->route('admin.datauser.index')->with('success', 'DataUser created successfully.');
+        return redirect()->route('admin.datauser.index')->with('success', 'Pengguna berhasil ditambahkan.');
     }
 
     /**
@@ -70,30 +56,20 @@ class DataUserController extends Controller
      */
     public function update(Request $request, DataUser $datauser)
     {
-        $validator = Validator::make($request->all(), [
-            'nama' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:DataUser,email,' . $datauser->idDataUser . ',idDataUser',
-            'password' => 'nullable|string|min:8|confirmed',
-        ]);
+        $validated = $this->validateDataUser($request, $datauser->idDataUser);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        $data = [
-            'nama' => $request->nama,
-            'email' => $request->email,
+        $updateData = [
+            'nama' => $validated['nama'],
+            'email' => $validated['email'],
         ];
 
-        if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
+        if (!empty($validated['password'])) {
+            $updateData['password'] = Hash::make($validated['password']);
         }
 
-        $datauser->update($data);
+        $datauser->update($updateData);
 
-        return redirect()->route('admin.datauser.index')->with('success', 'DataUser updated successfully.');
+        return redirect()->route('admin.datauser.index')->with('success', 'Pengguna berhasil diperbarui.');
     }
 
     /**
@@ -104,5 +80,51 @@ class DataUserController extends Controller
         $datauser->delete();
 
         return redirect()->route('admin.datauser.index')->with('success', 'DataUser deleted successfully.');
+    }
+
+    /**
+     * Validation helper for DataUser
+     */
+    protected function validateDataUser(Request $request, $id = null)
+    {
+        $uniqueEmail = $id
+            ? 'unique:DataUser,email,' . $id . ',idDataUser'
+            : 'unique:DataUser,email';
+
+        $rules = [
+            'nama' => ['required', 'string', 'min:3', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', $uniqueEmail],
+        ];
+
+        if ($id) {
+            // password optional on update
+            $rules['password'] = ['nullable', 'string', 'min:8', 'confirmed'];
+        } else {
+            $rules['password'] = ['required', 'string', 'min:8', 'confirmed'];
+        }
+
+        return $request->validate($rules, [
+            'nama.required' => 'Nama wajib diisi.',
+            'nama.string' => 'Nama harus berupa teks.',
+            'nama.min' => 'Nama minimal 3 karakter.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+        ]);
+    }
+
+    /**
+     * Create helper for DataUser
+     */
+    protected function createDataUser(array $data)
+    {
+        return DataUser::create([
+            'nama' => $data['nama'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+        ]);
     }
 }

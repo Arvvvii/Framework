@@ -31,19 +31,12 @@ class JenisHewanController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'nama_jenis_hewan' => 'required|string|max:255|unique:jenis_hewan,nama_jenis_hewan',
-        ]);
+        // Validate input and create using helper methods
+        $validated = $this->validateJenisHewan($request);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
+        $jenis = $this->createJenisHewan($validated);
 
-        JenisHewan::create($request->only(['nama_jenis_hewan']));
-
-        return redirect()->route('admin.jenishawan.index')->with('success', 'JenisHewan created successfully.');
+        return redirect()->route('admin.jenishewan.index')->with('success', 'Jenis hewan berhasil ditambahkan.');
     }
 
     /**
@@ -67,19 +60,13 @@ class JenisHewanController extends Controller
      */
     public function update(Request $request, JenisHewan $jenishawan)
     {
-        $validator = Validator::make($request->all(), [
-            'nama_jenis_hewan' => 'required|string|max:255|unique:jenis_hewan,nama_jenis_hewan,' . $jenishawan->idjenis_hewan . ',idjenis_hewan',
+        $validated = $this->validateJenisHewan($request, $jenishawan->idjenis_hewan);
+
+        $jenishawan->update([
+            'nama_jenis_hewan' => $this->formatNamaJenisHewan($validated['nama_jenis_hewan']),
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        $jenishawan->update($request->only(['nama_jenis_hewan']));
-
-        return redirect()->route('admin.jenishawan.index')->with('success', 'JenisHewan updated successfully.');
+        return redirect()->route('admin.jenishewan.index')->with('success', 'Jenis hewan berhasil diperbarui.');
     }
 
     /**
@@ -89,6 +76,44 @@ class JenisHewanController extends Controller
     {
         $jenishawan->delete();
 
-        return redirect()->route('admin.jenishawan.index')->with('success', 'JenisHewan deleted successfully.');
+        return redirect()->route('admin.jenishewan.index')->with('success', 'Jenis hewan berhasil dihapus.');
+    }
+
+    /**
+     * Validate input for create/update
+     */
+    protected function validateJenisHewan(Request $request, $id = null)
+    {
+        $uniqueRule = $id
+            ? 'unique:jenis_hewan,nama_jenis_hewan,' . $id . ',idjenis_hewan'
+            : 'unique:jenis_hewan,nama_jenis_hewan';
+
+        return $request->validate([
+            'nama_jenis_hewan' => ['required', 'string', 'max:255', 'min:3', $uniqueRule],
+        ], [
+            'nama_jenis_hewan.required' => 'Nama jenis hewan wajib diisi.',
+            'nama_jenis_hewan.string' => 'Nama jenis hewan harus berupa teks.',
+            'nama_jenis_hewan.max' => 'Nama jenis hewan maksimal 255 karakter.',
+            'nama_jenis_hewan.min' => 'Nama jenis hewan minimal 3 karakter.',
+            'nama_jenis_hewan.unique' => 'Nama jenis hewan sudah terdaftar.',
+        ]);
+    }
+
+    /**
+     * Helper to create jenis hewan record
+     */
+    protected function createJenisHewan(array $data)
+    {
+        return JenisHewan::create([
+            'nama_jenis_hewan' => $this->formatNamaJenisHewan($data['nama_jenis_hewan']),
+        ]);
+    }
+
+    /**
+     * Format nama jenis hewan (title case)
+     */
+    protected function formatNamaJenisHewan(string $nama)
+    {
+        return trim(ucwords(strtolower($nama)));
     }
 }

@@ -31,19 +31,11 @@ class KategoriKlinisController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'nama_kategori_klinis' => 'required|string|max:255|unique:kategori_klinis,nama_kategori_klinis',
-        ]);
+        $validated = $this->validateKategoriKlinis($request);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
+        $this->createKategoriKlinis($validated);
 
-        KategoriKlinis::create($request->only(['nama_kategori_klinis']));
-
-        return redirect()->route('admin.kategoriklinis.index')->with('success', 'KategoriKlinis created successfully.');
+        return redirect()->route('admin.kategoriklinis.index')->with('success', 'Kategori klinis berhasil ditambahkan.');
     }
 
     /**
@@ -67,19 +59,13 @@ class KategoriKlinisController extends Controller
      */
     public function update(Request $request, KategoriKlinis $kategoriklinis)
     {
-        $validator = Validator::make($request->all(), [
-            'nama_kategori_klinis' => 'required|string|max:255|unique:kategori_klinis,nama_kategori_klinis,' . $kategoriklinis->idkategori_klinis . ',idkategori_klinis',
+        $validated = $this->validateKategoriKlinis($request, $kategoriklinis->idkategori_klinis);
+
+        $kategoriklinis->update([
+            'nama_kategori_klinis' => $this->formatNamaKategoriKlinis($validated['nama_kategori_klinis']),
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        $kategoriklinis->update($request->only(['nama_kategori_klinis']));
-
-        return redirect()->route('admin.kategoriklinis.index')->with('success', 'KategoriKlinis updated successfully.');
+        return redirect()->route('admin.kategoriklinis.index')->with('success', 'Kategori klinis berhasil diperbarui.');
     }
 
     /**
@@ -90,5 +76,43 @@ class KategoriKlinisController extends Controller
         $kategoriklinis->delete();
 
         return redirect()->route('admin.kategoriklinis.index')->with('success', 'KategoriKlinis deleted successfully.');
+    }
+
+    /**
+     * Validation helper for Kategori Klinis
+     */
+    protected function validateKategoriKlinis(Request $request, $id = null)
+    {
+        $uniqueRule = $id
+            ? 'unique:kategori_klinis,nama_kategori_klinis,' . $id . ',idkategori_klinis'
+            : 'unique:kategori_klinis,nama_kategori_klinis';
+
+        return $request->validate([
+            'nama_kategori_klinis' => ['required', 'string', 'min:3', 'max:255', $uniqueRule],
+        ], [
+            'nama_kategori_klinis.required' => 'Nama kategori klinis wajib diisi.',
+            'nama_kategori_klinis.string' => 'Nama kategori klinis harus berupa teks.',
+            'nama_kategori_klinis.min' => 'Nama kategori klinis minimal 3 karakter.',
+            'nama_kategori_klinis.max' => 'Nama kategori klinis maksimal 255 karakter.',
+            'nama_kategori_klinis.unique' => 'Nama kategori klinis sudah terdaftar.',
+        ]);
+    }
+
+    /**
+     * Create helper for Kategori Klinis
+     */
+    protected function createKategoriKlinis(array $data)
+    {
+        return KategoriKlinis::create([
+            'nama_kategori_klinis' => $this->formatNamaKategoriKlinis($data['nama_kategori_klinis']),
+        ]);
+    }
+
+    /**
+     * Format helper for Kategori Klinis
+     */
+    protected function formatNamaKategoriKlinis(string $nama)
+    {
+        return trim(ucwords(strtolower($nama)));
     }
 }
