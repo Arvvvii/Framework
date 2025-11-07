@@ -97,21 +97,18 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
     // -- GROUPING SEMUA ROUTE CRUD (Admin) --
-    Route::get('admin/role', [RoleController::class, 'index'])->name('admin.role.index');
-    Route::get('admin/datauser', [DataUserController::class, 'index'])->name('admin.datauser.index');
-    Route::get('admin/jenishewan', [JenisHewanController::class, 'index'])->name('admin.jenishewan.index');
-    Route::get('admin/jenishewan/create', [JenisHewanController::class, 'create'])->name('admin.jenishewan.create');
-    Route::post('admin/jenishewan', [JenisHewanController::class, 'store'])->name('admin.jenishewan.store');
-    Route::get('admin/jenishewan/{jenishawan}/edit', [JenisHewanController::class, 'edit'])->name('admin.jenishewan.edit');
-    Route::put('admin/jenishewan/{jenishawan}', [JenisHewanController::class, 'update'])->name('admin.jenishewan.update');
-    Route::delete('admin/jenishewan/{jenishawan}', [JenisHewanController::class, 'destroy'])->name('admin.jenishewan.destroy');
-    Route::get('admin/kategori', [KategoriController::class, 'index'])->name('admin.kategori.index');
-    Route::get('admin/kategoriklinis', [KategoriKlinisController::class, 'index'])->name('admin.kategoriklinis.index');
-    Route::get('admin/kodeterapi', [KodeTindakanTerapiController::class, 'index'])->name('admin.kodeterapi.index');
-    Route::get('admin/pet', [PetController::class, 'index'])->name('admin.pet.index');
-    Route::get('admin/rashewan', [RasHewanController::class, 'index'])->name('admin.rashewan.index');
-    Route::get('admin/pemilik', [PemilikController::class, 'index'])->name('admin.pemilik.index');
-    Route::get('admin/rekammedis', [RekamMedisController::class, 'index'])->name('admin.rekammedis.index');
+    // Register full resource routes for admin masters so create/edit/store/update/destroy
+    // route names are available (e.g. admin.role.create, admin.rashewan.create, etc.).
+    Route::resource('admin/role', RoleController::class, ['as' => 'admin']);
+    Route::resource('admin/datauser', DataUserController::class, ['as' => 'admin']);
+    Route::resource('admin/jenishewan', JenisHewanController::class, ['as' => 'admin']);
+    Route::resource('admin/kategori', KategoriController::class, ['as' => 'admin']);
+    Route::resource('admin/kategoriklinis', KategoriKlinisController::class, ['as' => 'admin']);
+    Route::resource('admin/kodeterapi', KodeTindakanTerapiController::class, ['as' => 'admin']);
+    Route::resource('admin/pet', PetController::class, ['as' => 'admin']);
+    Route::resource('admin/rashewan', RasHewanController::class, ['as' => 'admin']);
+    Route::resource('admin/pemilik', PemilikController::class, ['as' => 'admin']);
+    Route::resource('admin/rekammedis', RekamMedisController::class, ['as' => 'admin']);
 });
 
 Route::middleware(['auth', 'resepsionis'])->group(function () {

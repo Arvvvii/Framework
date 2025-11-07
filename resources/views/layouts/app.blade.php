@@ -49,15 +49,32 @@
                                 </li>
                             @endif
                         @else
+                            {{-- Show admin links when session role indicates admin.
+                                 Check session role id *or* session role name to support cases
+                                 where Administrator's id isn't literally 1. --}}
+                            @php
+                                $isAdminSession = false;
+                                if (session('user_role')) {
+                                    $isAdminSession = ((int) session('user_role') === 1);
+                                }
+                                if (!$isAdminSession && session('user_role_name')) {
+                                    $isAdminSession = in_array(strtolower(session('user_role_name')), ['administrator', 'admin']);
+                                }
+                            @endphp
+                            @if($isAdminSession)
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('admin.dashboard') }}">Admin</a>
+                                </li>
+                            @endif
+
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
+                                    {{ session('user_name') ?? Auth::user()->nama ?? Auth::user()->name }}
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
+                                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                         {{ __('Logout') }}
                                     </a>
 

@@ -14,9 +14,8 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.kategoriklinis.index') }}" method="get"></form>
-
-    <form action="{{ route('admin.kategoriklinis.index') }}" method="post">
+    {{-- Use the resource store route for creating a new Kategori Klinis --}}
+    <form action="{{ route('admin.kategoriklinis.store') }}" method="post">
         @csrf
         <div class="mb-3">
             <label for="nama_kategori_klinis" class="form-label">Nama Kategori Klinis</label>
