@@ -1,51 +1,86 @@
-@extends('layouts.app')
+@extends('layouts.admin.main')
+
+@section('title', 'Data Pemilik')
 
 @section('content')
-<div class="container">
-    <h1>Pemilik Management</h1>
-
-    <div class="mb-3">
-        <a href="{{ route('admin.pemilik.create') }}" class="btn btn-primary">Tambah Pemilik</a>
-    </div>
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="mb-0">Data Pemilik</h3>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Data Pemilik</li>
+                </ol>
+            </div>
         </div>
-    @endif
+    </div>
+</div>
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>No WA</th>
-                <th>Alamat</th>
-                <th>User</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($pemiliks as $p)
-                <tr>
-                    <td>{{ $p->idpemilik }}</td>
-                    <td>{{ $p->no_wa }}</td>
-                    <td>{{ $p->alamat }}</td>
-                    <td>{{ $p->user->nama ?? 'N/A' }}</td>
-                    <td>
-                        <a href="{{ route('admin.pemilik.edit', $p) }}" class="btn btn-sm btn-secondary">Edit</a>
+<div class="app-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">Daftar Pemilik</h3>
+                        <div class="card-tools">
+                            <a href="{{ route('admin.pemilik.create') }}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-plus-circle"></i> Tambah Pemilik
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if(session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
 
-                        <form action="{{ route('admin.pemilik.destroy', $p) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus pemilik ini?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="4">No pemilik found.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10px">#</th>
+                                    <th>No WhatsApp</th>
+                                    <th>Alamat</th>
+                                    <th>User</th>
+                                    <th style="width: 200px">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($pemiliks as $p)
+                                    <tr class="align-middle">
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $p->no_wa }}</td>
+                                        <td>{{ $p->alamat }}</td>
+                                        <td>{{ $p->user_nama ?? 'N/A' }}</td>
+                                        <td>
+                                            <a href="{{ route('admin.pemilik.edit', $p->idpemilik) }}" class="btn btn-sm btn-warning">
+                                                <i class="bi bi-pencil-square"></i> Edit
+                                            </a>
+                                            <form action="{{ route('admin.pemilik.destroy', $p->idpemilik) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus data ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <i class="bi bi-trash"></i> Hapus
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center">Tidak ada data pemilik.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
