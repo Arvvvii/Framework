@@ -10,6 +10,12 @@ class TemuDokter extends Model
     use HasFactory;
 
     /**
+     * Disable automatic timestamps because `temu_dokter` table does not have
+     * `created_at`/`updated_at` columns.
+     */
+    public $timestamps = false;
+
+    /**
      * The table associated with the model.
      *
      * @var string

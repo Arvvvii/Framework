@@ -1,0 +1,100 @@
+@extends('layouts.admin.main')
+
+@section('title', 'Edit Dokter')
+
+@section('content')
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Edit Data Dokter</h3>
+                </div>
+                <form action="{{ route('admin.dokter.update', $dokter->id_dokter) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="card-body">
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <div class="mb-3">
+                            <label for="id_user" class="form-label">Pilih User <span class="text-danger">*</span></label>
+                            <select class="form-select @error('id_user') is-invalid @enderror" id="id_user" name="id_user" required>
+                                <option value="">-- Pilih User --</option>
+                                @foreach($unassignedUsers as $user)
+                                    <option value="{{ $user->iduser }}" {{ old('id_user', $dokter->id_user) == $user->iduser ? 'selected' : '' }}>
+                                        {{ $user->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('id_user')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="alamat" class="form-label">Alamat <span class="text-danger">*</span></label>
+                            <textarea class="form-control @error('alamat') is-invalid @enderror" id="alamat" name="alamat" rows="3" required>{{ old('alamat', $dokter->alamat) }}</textarea>
+                            @error('alamat')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="no_hp" class="form-label">No HP <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('no_hp') is-invalid @enderror" id="no_hp" name="no_hp" value="{{ old('no_hp', $dokter->no_hp) }}" required>
+                            @error('no_hp')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="bidang_dokter" class="form-label">Bidang Dokter <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('bidang_dokter') is-invalid @enderror" id="bidang_dokter" name="bidang_dokter" value="{{ old('bidang_dokter', $dokter->bidang_dokter) }}" required>
+                            @error('bidang_dokter')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Jenis Kelamin <span class="text-danger">*</span></label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input @error('jenis_kelamin') is-invalid @enderror" type="radio" name="jenis_kelamin" id="jenis_kelamin_l" value="L" {{ old('jenis_kelamin', $dokter->jenis_kelamin) == 'L' ? 'checked' : '' }} required>
+                                    <label class="form-check-label" for="jenis_kelamin_l">
+                                        Laki-laki
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input @error('jenis_kelamin') is-invalid @enderror" type="radio" name="jenis_kelamin" id="jenis_kelamin_p" value="P" {{ old('jenis_kelamin', $dokter->jenis_kelamin) == 'P' ? 'checked' : '' }} required>
+                                    <label class="form-check-label" for="jenis_kelamin_p">
+                                        Perempuan
+                                    </label>
+                                </div>
+                            </div>
+                            @error('jenis_kelamin')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update
+                        </button>
+                        <a href="{{ route('admin.dokter.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

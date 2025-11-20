@@ -18,12 +18,12 @@ class DataUser extends Authenticatable
      * PENTING: Jika tabel Anda benar-benar bernama 'datauser', ini sudah benar.
      */
     // Migration creates table 'datauser' so model should reference it
-    protected $table = 'user'; // ganti ke nama tabel yang sebenarnya di database Anda
+    protected $table = 'user'; // Nama tabel di database: user
 
     /**
      * The primary key associated with the table.
      */
-    protected $primaryKey = 'iduser'; // Menggunakan iduser
+    protected $primaryKey = 'iduser'; // Primary key adalah 'iduser'
     public $incrementing = true; // Menonaktifkan auto-increment jika iduser bukan auto-increment
     protected $keyType = 'int'; // Tipe data primary key
     protected $fillable = [
@@ -38,11 +38,11 @@ class DataUser extends Authenticatable
 
     /**
      * Get the pemilik associated with the DataUser (One to One).
-     * PERBAIKAN: Menggunakan iduser sebagai foreign key karena Anda menggunakan iduser sebagai primary key.
+     * PERBAIKAN: Menggunakan iduser sebagai foreign key.
      */
     public function pemilik()
     {
-        // Asumsi: foreign key di tabel 'pemilik' adalah 'iduser'
+        // foreign key di tabel 'pemilik' adalah 'iduser' yang merujuk ke 'iduser' di tabel 'user'
         return $this->hasOne(Pemilik::class, 'iduser', 'iduser');
     }
 
@@ -51,7 +51,7 @@ class DataUser extends Authenticatable
      */
     public function roles()
     {
-        // Asumsi: Pivot table: role_user, foreign key: iduser, related key: idrole
+        // Pivot table: role_user, foreign key: iduser (merujuk ke iduser), related key: idrole
         return $this->belongsToMany(Role::class, 'role_user', 'iduser', 'idrole');
     }
 
@@ -61,7 +61,23 @@ class DataUser extends Authenticatable
      */
     public function roleUsers()
     {
-        // Asumsi: foreign key di tabel 'role_user' adalah 'iduser'
+        // foreign key di tabel 'role_user' adalah 'iduser' yang merujuk ke 'iduser' di tabel 'user'
         return $this->hasMany(RoleUser::class, 'iduser', 'iduser');
+    }
+
+    /**
+     * Get the dokter associated with the DataUser (One to One).
+     */
+    public function dokter()
+    {
+        return $this->hasOne(Dokter::class, 'id_user', 'iduser');
+    }
+
+    /**
+     * Get the perawat associated with the DataUser (One to One).
+     */
+    public function perawat()
+    {
+        return $this->hasOne(Perawat::class, 'id_user', 'iduser');
     }
 }

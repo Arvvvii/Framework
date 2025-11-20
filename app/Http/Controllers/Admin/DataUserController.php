@@ -3,17 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\DataUser;
+// use App\Models\DataUser; // Hapus atau jadikan komentar
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB; // PENTING: Import DB
 
 class DataUserController extends Controller
 {
-   // Menampilkan daftar DataUser
+    // Menampilkan daftar DataUser (READ)
     public function index()
     {
-        $datausers = DataUser::all();
+        // GANTI: $datausers = DataUser::all();
+        $datausers = DB::table('user')->get();
         return view('admin.DataUser.index', compact('datausers'));
     }
 
@@ -24,7 +26,7 @@ class DataUserController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage. (CREATE)
      */
     public function store(Request $request)
     {
@@ -36,60 +38,72 @@ class DataUserController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource. (SHOW)
      */
-    public function show(DataUser $datauser)
+    public function show($idDataUser) // Model Binding diganti
     {
+        // Menggunakan Query Builder
+        $datauser = DB::table('user')->where('iduser', $idDataUser)->first();
+        if (!$datauser) {
+            abort(404);
+        }
         return view('admin.DataUser.show', compact('datauser'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified resource. (EDIT)
      */
-    public function edit(DataUser $datauser)
+    public function edit($idDataUser) // Model Binding diganti
     {
+        // Menggunakan Query Builder
+        $datauser = DB::table('user')->where('iduser', $idDataUser)->first();
+        if (!$datauser) {
+            abort(404);
+        }
         return view('admin.DataUser.edit', compact('datauser'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource in storage. (UPDATE)
      */
-    public function update(Request $request, DataUser $datauser)
+    public function update(Request $request, $idDataUser) // Model Binding diganti
     {
-        $validated = $this->validateDataUser($request, $datauser->idDataUser);
+        $validated = $this->validateDataUser($request, $idDataUser);
 
         $updateData = [
             'nama' => $validated['nama'],
             'email' => $validated['email'],
+            'updated_at' => now(), // Tambahkan manual jika kolom ada
         ];
 
         if (!empty($validated['password'])) {
             $updateData['password'] = Hash::make($validated['password']);
         }
 
-        $datauser->update($updateData);
+        // GANTI: $datauser->update($updateData);
+        DB::table('user')->where('iduser', $idDataUser)->update($updateData);
 
         return redirect()->route('admin.datauser.index')->with('success', 'Pengguna berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage. (DELETE)
      */
-    public function destroy(DataUser $datauser)
+    public function destroy($idDataUser) // Model Binding diganti
     {
-        $datauser->delete();
+        // GANTI: $datauser->delete();
+        DB::table('user')->where('iduser', $idDataUser)->delete();
 
         return redirect()->route('admin.datauser.index')->with('success', 'DataUser deleted successfully.');
     }
 
-    /**
-     * Validation helper for DataUser
-     */
+    // --- HELPER METHOD (DIBIARKAN SAMA KARENA LOGIC VALIDASI TIDAK BERUBAH) ---
+
     protected function validateDataUser(Request $request, $id = null)
     {
         $uniqueEmail = $id
-            ? 'unique:DataUser,email,' . $id . ',idDataUser'
-            : 'unique:DataUser,email';
+            ? 'unique:user,email,' . $id . ',iduser'
+            : 'unique:user,email';
 
         $rules = [
             'nama' => ['required', 'string', 'min:3', 'max:255'],
@@ -97,7 +111,6 @@ class DataUserController extends Controller
         ];
 
         if ($id) {
-            // password optional on update
             $rules['password'] = ['nullable', 'string', 'min:8', 'confirmed'];
         } else {
             $rules['password'] = ['required', 'string', 'min:8', 'confirmed'];
@@ -105,13 +118,10 @@ class DataUserController extends Controller
 
         return $request->validate($rules, [
             'nama.required' => 'Nama wajib diisi.',
-            'nama.string' => 'Nama harus berupa teks.',
             'nama.min' => 'Nama minimal 3 karakter.',
             'email.required' => 'Email wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan.',
             'password.required' => 'Password wajib diisi.',
-            'password.min' => 'Password minimal 8 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
     }
@@ -121,7 +131,8 @@ class DataUserController extends Controller
      */
     protected function createDataUser(array $data)
     {
-        return DataUser::create([
+        // GANTI: return DataUser::create([...]);
+        return DB::table('user')->insert([
             'nama' => $data['nama'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),

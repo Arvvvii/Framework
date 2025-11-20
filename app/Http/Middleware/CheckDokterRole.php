@@ -22,11 +22,10 @@ class CheckDokterRole
         }
 
         $user = Auth::user();
+        $userRole = session('user_role');
 
-        // Check if user has dokter role
-        $hasDokterRole = $user->roles()->where('nama_role', 'dokter')->exists();
-
-        if (!$hasDokterRole) {
+        // Check if user has dokter role (role ID 2)
+        if ($userRole != 2) {
             abort(403, 'Unauthorized. Dokter access required.');
         }
 

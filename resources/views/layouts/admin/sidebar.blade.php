@@ -63,8 +63,8 @@
 				</li>
 
 				<!-- Dropdown: Manajemen User -->
-				<li class="nav-item {{ request()->routeIs('admin.datauser.*') || request()->routeIs('admin.role.*') ? 'menu-open' : '' }}">
-					<a href="#" class="nav-link {{ request()->routeIs('admin.datauser.*') || request()->routeIs('admin.role.*') ? 'active' : '' }}">
+				<li class="nav-item {{ request()->routeIs('admin.datauser.*') || request()->routeIs('admin.role.*') || request()->routeIs('admin.dokter.*') || request()->routeIs('admin.perawat.*') ? 'menu-open' : '' }}">
+					<a href="#" class="nav-link {{ request()->routeIs('admin.datauser.*') || request()->routeIs('admin.role.*') || request()->routeIs('admin.dokter.*') || request()->routeIs('admin.perawat.*') ? 'active' : '' }}">
 						<i class="nav-icon bi bi-people"></i>
 						<p>
 							Manajemen User
@@ -82,6 +82,18 @@
 							<a href="{{ route('admin.role.index') }}" class="nav-link {{ request()->routeIs('admin.role.*') ? 'active' : '' }}">
 								<i class="nav-icon bi bi-circle"></i>
 								<p>Role</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="{{ route('admin.dokter.index') }}" class="nav-link {{ request()->routeIs('admin.dokter.*') ? 'active' : '' }}">
+								<i class="nav-icon fas fa-stethoscope"></i>
+								<p>Dokter</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="{{ route('admin.perawat.index') }}" class="nav-link {{ request()->routeIs('admin.perawat.*') ? 'active' : '' }}">
+								<i class="nav-icon fas fa-user-nurse"></i>
+								<p>Perawat</p>
 							</a>
 						</li>
 					</ul>
@@ -123,7 +135,7 @@
 					</a>
 					<ul class="nav nav-treeview">
 						<li class="nav-item">
-							<a href="#" class="nav-link">
+							<a href="{{ route('admin.temudokter.index') }}" class="nav-link {{ request()->routeIs('admin.temudokter.*') ? 'active' : '' }}">
 								<i class="nav-icon bi bi-circle"></i>
 								<p>Temu Dokter</p>
 							</a>

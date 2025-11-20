@@ -3,25 +3,34 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Pet;
-use App\Models\Pemilik;
-use App\Models\RasHewan;
+// use App\Models\Pet; // Hapus atau jadikan komentar
+use App\Models\Pemilik; // Tetap diperlukan untuk create/edit form
+use App\Models\RasHewan; // Tetap diperlukan untuk create/edit form
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB; // PENTING: Import DB
 
 class PetController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource. (READ - Menggunakan JOIN)
      */
     public function index()
     {
-        $pets = Pet::with('pemilik', 'rasHewan')->get();
+        // GANTI: $pets = Pet::with('pemilik', 'rasHewan')->get();
+        // Menggunakan Query Builder dengan JOIN
+        $pets = DB::table('pet AS p')
+            ->leftJoin('pemilik AS pm', 'p.idpemilik', '=', 'pm.idpemilik')
+            ->leftJoin('user AS u', 'pm.iduser', '=', 'u.iduser')
+            ->leftJoin('ras_hewan AS rh', 'p.idras_hewan', '=', 'rh.idras_hewan')
+            ->select('p.*', 'pm.no_wa AS pemilik_no_wa', 'pm.alamat AS pemilik_alamat', 'u.nama AS pemilik_nama', 'rh.nama_ras')
+            ->get();
+            
         return view('admin.Pet.index', compact('pets'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new resource. (Helper data tetap Eloquent)
      */
     public function create()
     {
@@ -31,7 +40,7 @@ class PetController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage. (CREATE)
      */
     public function store(Request $request)
     {
@@ -50,34 +59,44 @@ class PetController extends Controller
                 ->withInput();
         }
 
-        Pet::create($request->only(['nama', 'tanggal_lahir', 'warna_tanda', 'jenis_kelamin', 'idpemilik', 'idras_hewan']));
+        // GANTI: Pet::create($request->only([...]));
+        DB::table('pet')->insert($request->only(['nama', 'tanggal_lahir', 'warna_tanda', 'jenis_kelamin', 'idpemilik', 'idras_hewan']));
 
         return redirect()->route('admin.pet.index')->with('success', 'Pet created successfully.');
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource. (SHOW)
      */
-    public function show(Pet $pet)
+    public function show($idpet) // Model Binding diganti
     {
-        $pet->load('pemilik', 'rasHewan');
+        $pet = DB::table('pet')->where('idpet', $idpet)->first();
+        if (!$pet) {
+            abort(404);
+        }
+        // CATATAN: View SHOW harus diubah untuk menggunakan data relasi melalui Query Builder lagi, jika View membutuhkannya.
         return view('admin.Pet.show', compact('pet'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified resource. (EDIT)
      */
-    public function edit(Pet $pet)
+    public function edit($idpet) // Model Binding diganti
     {
+        $pet = DB::table('pet')->where('idpet', $idpet)->first();
+        if (!$pet) {
+            abort(404);
+        }
+        
         $pemiliks = Pemilik::all();
         $rashewans = RasHewan::all();
         return view('admin.Pet.edit', compact('pet', 'pemiliks', 'rashewans'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource in storage. (UPDATE)
      */
-    public function update(Request $request, Pet $pet)
+    public function update(Request $request, $idpet) // Model Binding diganti
     {
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string|max:255',
@@ -94,17 +113,21 @@ class PetController extends Controller
                 ->withInput();
         }
 
-        $pet->update($request->only(['nama', 'tanggal_lahir', 'warna_tanda', 'jenis_kelamin', 'idpemilik', 'idras_hewan']));
+        // GANTI: $pet->update($request->only([...]));
+        DB::table('pet')
+            ->where('idpet', $idpet)
+            ->update($request->only(['nama', 'tanggal_lahir', 'warna_tanda', 'jenis_kelamin', 'idpemilik', 'idras_hewan']));
 
         return redirect()->route('admin.pet.index')->with('success', 'Pet updated successfully.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage. (DELETE)
      */
-    public function destroy(Pet $pet)
+    public function destroy($idpet) // Model Binding diganti
     {
-        $pet->delete();
+        // GANTI: $pet->delete();
+        DB::table('pet')->where('idpet', $idpet)->delete();
 
         return redirect()->route('admin.pet.index')->with('success', 'Pet deleted successfully.');
     }

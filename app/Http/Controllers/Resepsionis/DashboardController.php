@@ -17,38 +17,12 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        // Get today's statistics
-        $today = Carbon::today();
+        // Get statistics
+        $totalPemilik = Pemilik::count();
+        $totalPet = Pet::count();
+        $totalTemuDokter = \App\Models\TemuDokter::count();
 
-        $stats = [
-            'today_registrations' => RekamMedis::whereDate('created_at', $today)->count(),
-            'total_patients' => Pet::count(),
-            'total_owners' => Pemilik::count(),
-            'pending_appointments' => 0, // You can customize this based on your appointment system
-        ];
-
-        // Get today's registrations (include related temuDokter -> pet -> pemilik)
-        $today_registrations = RekamMedis::with(['temuDokter.pet.pemilik'])
-            ->whereDate('created_at', $today)
-            ->orderBy('idrekam_medis', 'desc')
-            ->take(10)
-            ->get();
-
-        // Get upcoming appointments (placeholder - customize based on your system)
-        $upcoming_appointments = []; // You can implement this based on your appointment model
-
-        // Get recent patients
-        $recent_patients = Pet::with('pemilik')
-            ->orderBy('idpet', 'desc')
-            ->take(5)
-            ->get();
-
-        return view('resepsionis.dashboard', compact(
-            'stats',
-            'today_registrations',
-            'upcoming_appointments',
-            'recent_patients'
-        ));
+        return view('resepsionis.dashboard', compact('totalPemilik', 'totalPet', 'totalTemuDokter'));
     }
 
     /**

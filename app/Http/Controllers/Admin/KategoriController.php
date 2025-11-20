@@ -3,18 +3,23 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Kategori;
+// use App\Models\Kategori; // Hapus atau jadikan komentar
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB; // PENTING: Import Facade DB
 
 class KategoriController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource. (READ)
      */
     public function index()
     {
-        $kategoris = Kategori::all();
+        // GANTI: $kategoris = Kategori::all();
+        // Menggunakan Query Builder
+        $kategoris = DB::table('kategori')->get();
+        
+        // Output adalah stdClass Object, yang cocok dibaca oleh View Blade
         return view('admin.Kategori.index', compact('kategoris'));
     }
 
@@ -27,60 +32,83 @@ class KategoriController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage. (CREATE)
      */
     public function store(Request $request)
     {
         $validated = $this->validateKategori($request);
 
+        // GANTI: Menggunakan helper createKategori yang sudah diubah
         $this->createKategori($validated);
 
         return redirect()->route('admin.kategori.index')->with('success', 'Kategori berhasil ditambahkan.');
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource. (SHOW)
+     * CATATAN: Model Binding diganti dengan ID ($idkategori)
      */
-    public function show(Kategori $kategori)
+    public function show($idkategori)
     {
+        // Menggunakan Query Builder untuk ambil 1 data
+        $kategori = DB::table('kategori')->where('idkategori', $idkategori)->first();
+                        
+        if (!$kategori) {
+            abort(404);
+        }
+        
         return view('admin.Kategori.show', compact('kategori'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified resource. (EDIT)
+     * CATATAN: Model Binding diganti dengan ID ($idkategori)
      */
-    public function edit(Kategori $kategori)
+    public function edit($idkategori)
     {
+        // Menggunakan Query Builder untuk ambil 1 data
+        $kategori = DB::table('kategori')->where('idkategori', $idkategori)->first();
+
+        if (!$kategori) {
+            abort(404);
+        }
+        
         return view('admin.Kategori.edit', compact('kategori'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource in storage. (UPDATE)
      */
-    public function update(Request $request, Kategori $kategori)
+    public function update(Request $request, $idkategori) // Model Binding diganti
     {
-        $validated = $this->validateKategori($request, $kategori->idkategori);
+        $validated = $this->validateKategori($request, $idkategori);
 
-        $kategori->update([
-            'nama_kategori' => $this->formatNamaKategori($validated['nama_kategori']),
-        ]);
+        // GANTI: Menggunakan Query Builder untuk update
+        DB::table('kategori')
+            ->where('idkategori', $idkategori)
+            ->update([
+                'nama_kategori' => $this->formatNamaKategori($validated['nama_kategori']),
+                'updated_at' => now(), // Tambahkan manual jika kolom ada
+            ]);
 
         return redirect()->route('admin.kategori.index')->with('success', 'Kategori berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage. (DELETE)
      */
-    public function destroy(Kategori $kategori)
+    public function destroy($idkategori) // Model Binding diganti
     {
-        $kategori->delete();
+        // GANTI: Menggunakan Query Builder untuk delete
+        DB::table('kategori')
+            ->where('idkategori', $idkategori)
+            ->delete();
 
         return redirect()->route('admin.kategori.index')->with('success', 'Kategori deleted successfully.');
     }
 
-    /**
-     * Validation helper for Kategori
-     */
+    // --- HELPER METHOD (DIBIARKAN SAMA KARENA LOGIC VALIDASI TIDAK BERUBAH) ---
+
     protected function validateKategori(Request $request, $id = null)
     {
         $uniqueRule = $id
@@ -103,8 +131,11 @@ class KategoriController extends Controller
      */
     protected function createKategori(array $data)
     {
-        return Kategori::create([
+        // GANTI: Menggunakan Query Builder untuk INSERT
+        return DB::table('kategori')->insert([
             'nama_kategori' => $this->formatNamaKategori($data['nama_kategori']),
+            'created_at' => now(), // Tambahkan manual jika kolom ada
+            'updated_at' => now(), // Tambahkan manual jika kolom ada
         ]);
     }
 

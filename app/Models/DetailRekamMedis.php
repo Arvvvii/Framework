@@ -10,6 +10,12 @@ class DetailRekamMedis extends Model
     use HasFactory;
 
     /**
+     * This table does not use Laravel timestamps columns `created_at`/`updated_at`.
+     * Disable automatic timestamps to prevent QueryException when inserting.
+     */
+    public $timestamps = false;
+
+    /**
      * The table associated with the model.
      *
      * @var string

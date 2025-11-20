@@ -3,18 +3,20 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Role;
+// use App\Models\Role; // Hapus atau jadikan komentar
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB; // PENTING: Import DB
 
 class RoleController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource. (READ)
      */
     public function index()
     {
-        $roles = Role::all();
+        // GANTI: $roles = Role::all();
+        $roles = DB::table('role')->get();
         return view('admin.Role.index', compact('roles'));
     }
 
@@ -27,7 +29,7 @@ class RoleController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage. (CREATE)
      */
     public function store(Request $request)
     {
@@ -39,48 +41,60 @@ class RoleController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource. (SHOW)
      */
-    public function show(Role $role)
+    public function show($idrole) // Model Binding diganti
     {
+        $role = DB::table('role')->where('idrole', $idrole)->first();
+        if (!$role) {
+            abort(404);
+        }
         return view('admin.Role.show', compact('role'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified resource. (EDIT)
      */
-    public function edit(Role $role)
+    public function edit($idrole) // Model Binding diganti
     {
+        $role = DB::table('role')->where('idrole', $idrole)->first();
+        if (!$role) {
+            abort(404);
+        }
         return view('admin.Role.edit', compact('role'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource in storage. (UPDATE)
      */
-    public function update(Request $request, Role $role)
+    public function update(Request $request, $idrole) // Model Binding diganti
     {
-        $validated = $this->validateRole($request, $role->idrole);
+        $validated = $this->validateRole($request, $idrole);
 
-        $role->update([
-            'nama_role' => $this->formatNamaRole($validated['nama_role']),
-        ]);
+        // GANTI: $role->update([...]);
+        DB::table('role')
+            ->where('idrole', $idrole)
+            ->update([
+                'nama_role' => $this->formatNamaRole($validated['nama_role']),
+                'updated_at' => now(), // Tambahkan manual jika kolom ada
+            ]);
 
         return redirect()->route('admin.role.index')->with('success', 'Role berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage. (DELETE)
      */
-    public function destroy(Role $role)
+    public function destroy($idrole) // Model Binding diganti
     {
-        $role->delete();
+        // GANTI: $role->delete();
+        DB::table('role')->where('idrole', $idrole)->delete();
 
         return redirect()->route('admin.role.index')->with('success', 'Role deleted successfully.');
     }
 
-    /**
-     * Validation helper for Role
-     */
+    // --- HELPER METHOD (DIBIARKAN SAMA) ---
+
     protected function validateRole(Request $request, $id = null)
     {
         $uniqueRule = $id
@@ -103,14 +117,14 @@ class RoleController extends Controller
      */
     protected function createRole(array $data)
     {
-        return Role::create([
+        // GANTI: Menggunakan Query Builder untuk INSERT
+        return DB::table('role')->insert([
             'nama_role' => $this->formatNamaRole($data['nama_role']),
+            'created_at' => now(), // Tambahkan manual jika kolom ada
+            'updated_at' => now(), // Tambahkan manual jika kolom ada
         ]);
     }
 
-    /**
-     * Format helper for Role name
-     */
     protected function formatNamaRole(string $nama)
     {
         return trim(ucwords(strtolower($nama)));

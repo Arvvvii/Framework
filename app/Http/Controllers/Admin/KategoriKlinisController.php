@@ -3,18 +3,22 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\KategoriKlinis;
+// use App\Models\KategoriKlinis; // Hapus atau jadikan komentar
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB; // PENTING: Import Facade DB
 
 class KategoriKlinisController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource. (READ)
      */
     public function index()
     {
-        $kategorikliniss = KategoriKlinis::all();
+        // GANTI: $kategorikliniss = KategoriKlinis::all();
+        // Menggunakan Query Builder
+        $kategorikliniss = DB::table('kategori_klinis')->get();
+        
         return view('admin.KategoriKlinis.index', compact('kategorikliniss'));
     }
 
@@ -27,60 +31,83 @@ class KategoriKlinisController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage. (CREATE)
      */
     public function store(Request $request)
     {
         $validated = $this->validateKategoriKlinis($request);
 
+        // GANTI: Menggunakan helper createKategoriKlinis yang sudah diubah
         $this->createKategoriKlinis($validated);
 
         return redirect()->route('admin.kategoriklinis.index')->with('success', 'Kategori klinis berhasil ditambahkan.');
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource. (SHOW)
+     * CATATAN: Model Binding diganti dengan ID ($idkategori_klinis)
      */
-    public function show(KategoriKlinis $kategoriklinis)
+    public function show($idkategori_klinis)
     {
+        // Menggunakan Query Builder untuk ambil 1 data
+        $kategoriklinis = DB::table('kategori_klinis')->where('idkategori_klinis', $idkategori_klinis)->first();
+
+        if (!$kategoriklinis) {
+            abort(404);
+        }
+        
         return view('admin.KategoriKlinis.show', compact('kategoriklinis'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified resource. (EDIT)
+     * CATATAN: Model Binding diganti dengan ID ($idkategori_klinis)
      */
-    public function edit(KategoriKlinis $kategoriklinis)
+    public function edit($idkategori_klinis)
     {
+        // Menggunakan Query Builder untuk ambil 1 data
+        $kategoriklinis = DB::table('kategori_klinis')->where('idkategori_klinis', $idkategori_klinis)->first();
+
+        if (!$kategoriklinis) {
+            abort(404);
+        }
+
         return view('admin.KategoriKlinis.edit', compact('kategoriklinis'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource in storage. (UPDATE)
      */
-    public function update(Request $request, KategoriKlinis $kategoriklinis)
+    public function update(Request $request, $idkategori_klinis) // Model Binding diganti
     {
-        $validated = $this->validateKategoriKlinis($request, $kategoriklinis->idkategori_klinis);
+        $validated = $this->validateKategoriKlinis($request, $idkategori_klinis);
 
-        $kategoriklinis->update([
-            'nama_kategori_klinis' => $this->formatNamaKategoriKlinis($validated['nama_kategori_klinis']),
-        ]);
+        // GANTI: Menggunakan Query Builder untuk update
+        DB::table('kategori_klinis')
+            ->where('idkategori_klinis', $idkategori_klinis)
+            ->update([
+                'nama_kategori_klinis' => $this->formatNamaKategoriKlinis($validated['nama_kategori_klinis']),
+                'updated_at' => now(), // Tambahkan manual jika kolom ada
+            ]);
 
         return redirect()->route('admin.kategoriklinis.index')->with('success', 'Kategori klinis berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage. (DELETE)
      */
-    public function destroy(KategoriKlinis $kategoriklinis)
+    public function destroy($idkategori_klinis) // Model Binding diganti
     {
-        $kategoriklinis->delete();
+        // GANTI: Menggunakan Query Builder untuk delete
+        DB::table('kategori_klinis')
+            ->where('idkategori_klinis', $idkategori_klinis)
+            ->delete();
 
         return redirect()->route('admin.kategoriklinis.index')->with('success', 'KategoriKlinis deleted successfully.');
     }
 
-    /**
-     * Validation helper for Kategori Klinis
-     */
+    // --- HELPER METHOD (DIBIARKAN SAMA KARENA LOGIC VALIDASI TIDAK BERUBAH) ---
+
     protected function validateKategoriKlinis(Request $request, $id = null)
     {
         $uniqueRule = $id
@@ -103,8 +130,11 @@ class KategoriKlinisController extends Controller
      */
     protected function createKategoriKlinis(array $data)
     {
-        return KategoriKlinis::create([
+        // GANTI: Menggunakan Query Builder untuk INSERT
+        return DB::table('kategori_klinis')->insert([
             'nama_kategori_klinis' => $this->formatNamaKategoriKlinis($data['nama_kategori_klinis']),
+            'created_at' => now(), // Tambahkan manual jika kolom ada
+            'updated_at' => now(), // Tambahkan manual jika kolom ada
         ]);
     }
 

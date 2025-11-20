@@ -22,7 +22,16 @@
                     <li><a href="{{ route('layanan-umum') }}">Layanan Umum</a></li>
                     <li><a href="{{ route('visi-misi-tujuan') }}">Visi Misi dan Tujuan</a></li>
                     <li><a href="{{ route('berita') }}">Berita</a></li>
-                    <li><a href="{{ route('login') }}">Login</a></li>
+                    @auth
+                        <li><a href="#" onclick="event.preventDefault(); document.getElementById('logout-form-nav').submit();">
+                            {{ auth()->user()->nama }} (Logout)
+                        </a></li>
+                        <form id="logout-form-nav" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
+                    @else
+                        <li><a href="{{ route('login') }}">Login</a></li>
+                    @endauth
                 </ul>
             </div>
         </nav>

@@ -3,33 +3,40 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\RasHewan;
-use App\Models\JenisHewan;
+// use App\Models\RasHewan; // Hapus atau jadikan komentar
+use App\Models\JenisHewan; // Tetap diperlukan untuk create/edit form
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB; // PENTING: Import DB
 
 class RasHewanController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource. (READ - Menggunakan JOIN)
      */
     public function index()
     {
-        $rashewans = RasHewan::with('jenisHewan')->get();
+        // GANTI: $rashewans = RasHewan::with('jenisHewan')->get();
+        // Menggunakan Query Builder dengan JOIN
+        $rashewans = DB::table('ras_hewan AS rh')
+            ->leftJoin('jenis_hewan AS jh', 'rh.idjenis_hewan', '=', 'jh.idjenis_hewan')
+            ->select('rh.*', 'jh.nama_jenis_hewan') // Tambahkan kolom relasi yang dibutuhkan
+            ->get();
+            
         return view('admin.RasHewan.index', compact('rashewans'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new resource. (Helper data tetap Eloquent)
      */
     public function create()
     {
-        $jenishawans = JenisHewan::all();
+        $jenishawans = JenisHewan::all(); // Tetap pakai Eloquent untuk helper data
         return view('admin.RasHewan.create', compact('jenishawans'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage. (CREATE)
      */
     public function store(Request $request)
     {
@@ -41,51 +48,63 @@ class RasHewanController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource. (SHOW)
      */
-    public function show(RasHewan $rashewan)
+    public function show($idras_hewan) // Model Binding diganti
     {
-        $rashewan->load('jenisHewan');
+        $rashewan = DB::table('ras_hewan')->where('idras_hewan', $idras_hewan)->first();
+        if (!$rashewan) {
+            abort(404);
+        }
         return view('admin.RasHewan.show', compact('rashewan'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified resource. (EDIT)
      */
-    public function edit(RasHewan $rashewan)
+    public function edit($idras_hewan) // Model Binding diganti
     {
+        $rashewan = DB::table('ras_hewan')->where('idras_hewan', $idras_hewan)->first();
+        if (!$rashewan) {
+            abort(404);
+        }
+        
         $jenishawans = JenisHewan::all();
         return view('admin.RasHewan.edit', compact('rashewan', 'jenishawans'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource in storage. (UPDATE)
      */
-    public function update(Request $request, RasHewan $rashewan)
+    public function update(Request $request, $idras_hewan) // Model Binding diganti
     {
-        $validated = $this->validateRasHewan($request, $rashewan->idras_hewan);
+        $validated = $this->validateRasHewan($request, $idras_hewan);
 
-        $rashewan->update([
-            'nama_ras' => $this->formatNamaRas($validated['nama_ras']),
-            'idjenis_hewan' => $validated['idjenis_hewan'],
-        ]);
+        // GANTI: $rashewan->update([...]);
+        DB::table('ras_hewan')
+            ->where('idras_hewan', $idras_hewan)
+            ->update([
+                'nama_ras' => $this->formatNamaRas($validated['nama_ras']),
+                'idjenis_hewan' => $validated['idjenis_hewan'],
+                'updated_at' => now(),
+            ]);
 
         return redirect()->route('admin.rashewan.index')->with('success', 'Ras hewan berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage. (DELETE)
      */
-    public function destroy(RasHewan $rashewan)
+    public function destroy($idras_hewan) // Model Binding diganti
     {
-        $rashewan->delete();
+        // GANTI: $rashewan->delete();
+        DB::table('ras_hewan')->where('idras_hewan', $idras_hewan)->delete();
 
         return redirect()->route('admin.rashewan.index')->with('success', 'RasHewan deleted successfully.');
     }
 
-    /**
-     * Validation helper for RasHewan
-     */
+    // --- HELPER METHOD (DIBIARKAN SAMA) ---
+
     protected function validateRasHewan(Request $request, $id = null)
     {
         $uniqueRule = $id
@@ -97,9 +116,6 @@ class RasHewanController extends Controller
             'idjenis_hewan' => ['required', 'exists:jenis_hewan,idjenis_hewan'],
         ], [
             'nama_ras.required' => 'Nama ras wajib diisi.',
-            'nama_ras.string' => 'Nama ras harus berupa teks.',
-            'nama_ras.min' => 'Nama ras minimal 3 karakter.',
-            'nama_ras.max' => 'Nama ras maksimal 255 karakter.',
             'nama_ras.unique' => 'Nama ras sudah terdaftar.',
             'idjenis_hewan.required' => 'Jenis hewan wajib dipilih.',
             'idjenis_hewan.exists' => 'Jenis hewan tidak ditemukan.',
@@ -111,15 +127,15 @@ class RasHewanController extends Controller
      */
     protected function createRasHewan(array $data)
     {
-        return RasHewan::create([
+        // GANTI: Menggunakan Query Builder untuk INSERT
+        return DB::table('ras_hewan')->insert([
             'nama_ras' => $this->formatNamaRas($data['nama_ras']),
             'idjenis_hewan' => $data['idjenis_hewan'],
+            'created_at' => now(), 
+            'updated_at' => now(),
         ]);
     }
 
-    /**
-     * Format helper for Nama Ras
-     */
     protected function formatNamaRas(string $nama)
     {
         return trim(ucwords(strtolower($nama)));

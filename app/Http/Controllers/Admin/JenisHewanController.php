@@ -3,18 +3,25 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\JenisHewan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB; // PENTING: Import Facade DB untuk Query Builder
+// use App\Models\JenisHewan; // Hapus atau jadikan komentar karena kita tidak lagi menggunakan Model ini secara langsung
 
 class JenisHewanController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource. (READ)
      */
     public function index()
     {
-        $jenishawans = JenisHewan::all();
+        // GANTI: $jenishawans = JenisHewan::all();
+        // Menggunakan Query Builder
+        $jenishawans = DB::table('jenis_hewan')
+            ->select('idjenis_hewan', 'nama_jenis_hewan')
+            ->get();
+            
+        // Output Query Builder adalah stdClass Object, yang cocok dibaca oleh View Blade
         return view('admin.JenisHewan.index', compact('jenishawans'));
     }
 
@@ -27,60 +34,93 @@ class JenisHewanController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage. (CREATE)
      */
     public function store(Request $request)
     {
-        // Validate input and create using helper methods
+        // Validasi masih menggunakan helper validateJenisHewan
         $validated = $this->validateJenisHewan($request);
 
-        $jenis = $this->createJenisHewan($validated);
+        // GANTI: Menggunakan helper createJenisHewan yang sudah diubah ke Query Builder
+        $this->createJenisHewan($validated);
 
         return redirect()->route('admin.jenishewan.index')->with('success', 'Jenis hewan berhasil ditambahkan.');
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource. (SHOW)
+     * CATATAN: Ini membutuhkan perbaikan karena tidak bisa menggunakan Model Binding (JenisHewan $jenishawan)
      */
-    public function show(JenisHewan $jenishawan)
+    public function show($idjenis_hewan) // Parameter diubah menjadi ID
     {
+        // Menggunakan Query Builder untuk ambil 1 data
+        $jenishawan = DB::table('jenis_hewan')
+                        ->where('idjenis_hewan', $idjenis_hewan)
+                        ->first();
+                        
+        if (!$jenishawan) {
+            abort(404);
+        }
+        
+        // CATATAN: Variabel dikembalikan sebagai $jenishawan agar kompatibel dengan View
         return view('admin.JenisHewan.show', compact('jenishawan'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified resource. (EDIT)
+     * CATATAN: Ini membutuhkan perbaikan karena tidak bisa menggunakan Model Binding
      */
-    public function edit(JenisHewan $jenishawan)
+    public function edit($idjenis_hewan) // Parameter diubah menjadi ID
     {
+        // Menggunakan Query Builder untuk ambil 1 data
+        $jenishawan = DB::table('jenis_hewan')
+                        ->where('idjenis_hewan', $idjenis_hewan)
+                        ->first();
+
+        if (!$jenishawan) {
+            abort(404);
+        }
+        
         return view('admin.JenisHewan.edit', compact('jenishawan'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource in storage. (UPDATE)
      */
-    public function update(Request $request, JenisHewan $jenishawan)
+    public function update(Request $request, $idjenis_hewan) // Parameter diubah menjadi ID
     {
-        $validated = $this->validateJenisHewan($request, $jenishawan->idjenis_hewan);
+        // Validasi masih menggunakan helper validateJenisHewan
+        $validated = $this->validateJenisHewan($request, $idjenis_hewan);
 
-        $jenishawan->update([
-            'nama_jenis_hewan' => $this->formatNamaJenisHewan($validated['nama_jenis_hewan']),
-        ]);
+        // GANTI: Menggunakan Query Builder untuk update
+        DB::table('jenis_hewan')
+            ->where('idjenis_hewan', $idjenis_hewan)
+            ->update([
+                'nama_jenis_hewan' => $this->formatNamaJenisHewan($validated['nama_jenis_hewan']),
+                // updated_at akan diurus Query Builder secara otomatis jika kolomnya ada
+            ]);
 
         return redirect()->route('admin.jenishewan.index')->with('success', 'Jenis hewan berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage. (DELETE)
      */
-    public function destroy(JenisHewan $jenishawan)
+    public function destroy($idjenis_hewan) // Parameter diubah menjadi ID
     {
-        $jenishawan->delete();
+        // GANTI: Menggunakan Query Builder untuk delete
+        DB::table('jenis_hewan')
+            ->where('idjenis_hewan', $idjenis_hewan)
+            ->delete();
 
         return redirect()->route('admin.jenishewan.index')->with('success', 'Jenis hewan berhasil dihapus.');
     }
 
+    // --- HELPER METHOD (TETAP SAMA, TAPI DISESUAIKAN DENGAN DB::table()) ---
+
     /**
      * Validate input for create/update
+     * Note: Karena kita masih menggunakan Request->validate, logic ini masih bekerja dengan baik
      */
     protected function validateJenisHewan(Request $request, $id = null)
     {
@@ -104,8 +144,12 @@ class JenisHewanController extends Controller
      */
     protected function createJenisHewan(array $data)
     {
-        return JenisHewan::create([
+        // GANTI: Menggunakan Query Builder untuk INSERT
+        // Note: Query Builder::insert() mengembalikan boolean (true/false)
+        return DB::table('jenis_hewan')->insert([
             'nama_jenis_hewan' => $this->formatNamaJenisHewan($data['nama_jenis_hewan']),
+            'created_at' => now(), // Tambahkan manual jika kolom ada
+            'updated_at' => now(), // Tambahkan manual jika kolom ada
         ]);
     }
 

@@ -21,12 +21,8 @@ class CheckResepsionisRole
             return redirect('/login');
         }
 
-        $user = Auth::user();
-
-        // Check if user has resepsionis role
-        $hasResepsionisRole = $user->roles()->where('nama_role', 'resepsionis')->exists();
-
-        if (!$hasResepsionisRole) {
+        // Check if user has resepsionis role (role ID 4)
+        if (session('user_role') != 4) {
             abort(403, 'Unauthorized. Resepsionis access required.');
         }
 
