@@ -107,7 +107,6 @@ class KodeTindakanTerapiController extends Controller
                 'deskripsi_tindakan_terapi' => $validated['deskripsi_tindakan_terapi'],
                 'idkategori' => $validated['idkategori'],
                 'idkategori_klinis' => $validated['idkategori_klinis'],
-                'updated_at' => now(), // Tambahkan manual jika kolom ada
             ]);
 
         return redirect()->route('admin.kodeterapi.index')->with('success', 'Kode terapi berhasil diperbarui.');
@@ -163,8 +162,6 @@ class KodeTindakanTerapiController extends Controller
             'deskripsi_tindakan_terapi' => $data['deskripsi_tindakan_terapi'],
             'idkategori' => $data['idkategori'],
             'idkategori_klinis' => $data['idkategori_klinis'],
-            'created_at' => now(), // Tambahkan manual jika kolom ada
-            'updated_at' => now(), // Tambahkan manual jika kolom ada
         ]);
     }
 }

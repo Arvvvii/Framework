@@ -62,7 +62,12 @@
                                             {{ $td->waktu_daftar?->format('d-m-Y H:i') ?? 'N/A' }}<br>
                                             <small class="text-muted">{{ $td->waktu_daftar?->diffForHumans() }}</small>
                                         </td>
-                                        <td>{{ \Illuminate\Support\Str::limit($td->keluhan ?? 'N/A', 50) }}</td>
+                                        <td>
+                                            @php
+                                                $kel = $td->keluhan ?? optional($td->rekamMedis->first())->anamnesa;
+                                            @endphp
+                                            {{ Str::limit($kel ?? 'N/A', 50) }}
+                                        </td>
                                         <td>{{ $td->pet->nama ?? 'N/A' }}</td>
                                         <td>{{ $td->pet->pemilik->user->nama ?? 'N/A' }}</td>
                                         <td>{{ $td->pet->rasHewan->nama_ras ?? 'N/A' }}</td>

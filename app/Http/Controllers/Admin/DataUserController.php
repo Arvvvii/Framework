@@ -73,7 +73,6 @@ class DataUserController extends Controller
         $updateData = [
             'nama' => $validated['nama'],
             'email' => $validated['email'],
-            'updated_at' => now(), // Tambahkan manual jika kolom ada
         ];
 
         if (!empty($validated['password'])) {
@@ -111,9 +110,9 @@ class DataUserController extends Controller
         ];
 
         if ($id) {
-            $rules['password'] = ['nullable', 'string', 'min:8', 'confirmed'];
+            $rules['password'] = ['nullable', 'string', 'min:6', 'confirmed'];
         } else {
-            $rules['password'] = ['required', 'string', 'min:8', 'confirmed'];
+            $rules['password'] = ['required', 'string', 'min:6', 'confirmed'];
         }
 
         return $request->validate($rules, [

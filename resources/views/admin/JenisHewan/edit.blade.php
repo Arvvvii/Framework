@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin.main')
 
 @section('content')
 <div class="container">
@@ -18,7 +18,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('admin.jenishewan.update', $jenishawan) }}" method="POST">
+                    <form action="{{ route('admin.jenishewan.update', optional($jenishawan)->idjenis_hewan) }}" method="POST">
                         @csrf
                         @method('PUT')
 

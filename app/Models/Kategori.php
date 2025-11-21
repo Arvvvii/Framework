@@ -10,6 +10,11 @@ class Kategori extends Model
     use HasFactory;
 
     /**
+     * Disable timestamps - table does not have `created_at`/`updated_at`.
+     */
+    public $timestamps = false;
+
+    /**
      * The table associated with the model.
      *
      * @var string

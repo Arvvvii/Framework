@@ -83,11 +83,11 @@ class KategoriKlinisController extends Controller
         $validated = $this->validateKategoriKlinis($request, $idkategori_klinis);
 
         // GANTI: Menggunakan Query Builder untuk update
+        // Only update columns that actually exist on the table (no timestamps)
         DB::table('kategori_klinis')
             ->where('idkategori_klinis', $idkategori_klinis)
             ->update([
                 'nama_kategori_klinis' => $this->formatNamaKategoriKlinis($validated['nama_kategori_klinis']),
-                'updated_at' => now(), // Tambahkan manual jika kolom ada
             ]);
 
         return redirect()->route('admin.kategoriklinis.index')->with('success', 'Kategori klinis berhasil diperbarui.');
@@ -131,10 +131,9 @@ class KategoriKlinisController extends Controller
     protected function createKategoriKlinis(array $data)
     {
         // GANTI: Menggunakan Query Builder untuk INSERT
+        // Insert only the columns that exist. The table does not include timestamps.
         return DB::table('kategori_klinis')->insert([
             'nama_kategori_klinis' => $this->formatNamaKategoriKlinis($data['nama_kategori_klinis']),
-            'created_at' => now(), // Tambahkan manual jika kolom ada
-            'updated_at' => now(), // Tambahkan manual jika kolom ada
         ]);
     }
 

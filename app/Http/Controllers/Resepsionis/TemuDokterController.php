@@ -14,7 +14,7 @@ class TemuDokterController extends Controller
      */
     public function index()
     {
-        $temuDokter = TemuDokter::with('pet.pemilik.user', 'pet.rasHewan')
+        $temuDokter = TemuDokter::with('pet.pemilik.user', 'pet.rasHewan', 'rekamMedis')
             ->orderBy('waktu_daftar', 'desc')
             ->get();
         return view('resepsionis.TemuDokter.index', compact('temuDokter'));
@@ -37,7 +37,8 @@ class TemuDokterController extends Controller
         $request->validate([
             'id_pet' => 'required|exists:pet,idpet',
             'waktu_daftar' => 'required|date',
-            'keluhan' => 'required|string', // kept for UX but not stored (no keluhan column in DB)
+            // 'keluhan' is optional because DB may not have the column
+            'keluhan' => 'nullable|string',
         ]);
 
         // Determine current user's role_user id to store as idrole_user
@@ -48,6 +49,8 @@ class TemuDokterController extends Controller
             'waktu_daftar' => $request->waktu_daftar,
             'idrole_user' => $roleUser->idrole_user ?? null,
             'status' => '1', // default to '1' (Menunggu)
+            // Note: we intentionally do NOT persist 'keluhan' here because the
+            // `temu_dokter` table in some environments doesn't have that column.
         ]);
 
         return redirect()->route('resepsionis.temudokter.index')->with('success', 'Temu dokter berhasil dibuat!');

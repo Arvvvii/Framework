@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin.main')
 
 @section('content')
 <div class="container">
@@ -14,7 +14,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.kategori.update', $kategori) }}" method="post">
+    <form action="{{ route('admin.kategori.update', optional($kategori)->idkategori) }}" method="post">
         @csrf
         @method('PUT')
 

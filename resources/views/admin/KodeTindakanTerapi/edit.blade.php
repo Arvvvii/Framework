@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin.main')
 
 @section('content')
 <div class="container">
@@ -14,18 +14,18 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.kodeterapi.update', $kodeterapi) }}" method="post">
+    <form action="{{ route('admin.kodeterapi.update', optional($kodeterapi)->idkode_tindakan_terapi) }}" method="post">
         @csrf
         @method('PUT')
 
         <div class="mb-3">
             <label for="kode" class="form-label">Kode</label>
-            <input type="text" name="kode" id="kode" value="{{ old('kode', $kodeterapi->kode) }}" class="form-control">
+            <input type="text" name="kode" id="kode" value="{{ old('kode', optional($kodeterapi)->kode) }}" class="form-control">
         </div>
 
         <div class="mb-3">
             <label for="deskripsi_tindakan_terapi" class="form-label">Deskripsi</label>
-            <input type="text" name="deskripsi_tindakan_terapi" id="deskripsi_tindakan_terapi" value="{{ old('deskripsi_tindakan_terapi', $kodeterapi->deskripsi_tindakan_terapi) }}" class="form-control">
+            <input type="text" name="deskripsi_tindakan_terapi" id="deskripsi_tindakan_terapi" value="{{ old('deskripsi_tindakan_terapi', optional($kodeterapi)->deskripsi_tindakan_terapi) }}" class="form-control">
         </div>
 
         <div class="mb-3">

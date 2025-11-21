@@ -148,8 +148,6 @@ class JenisHewanController extends Controller
         // Note: Query Builder::insert() mengembalikan boolean (true/false)
         return DB::table('jenis_hewan')->insert([
             'nama_jenis_hewan' => $this->formatNamaJenisHewan($data['nama_jenis_hewan']),
-            'created_at' => now(), // Tambahkan manual jika kolom ada
-            'updated_at' => now(), // Tambahkan manual jika kolom ada
         ]);
     }
 

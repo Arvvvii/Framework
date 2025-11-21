@@ -86,7 +86,6 @@ class RasHewanController extends Controller
             ->update([
                 'nama_ras' => $this->formatNamaRas($validated['nama_ras']),
                 'idjenis_hewan' => $validated['idjenis_hewan'],
-                'updated_at' => now(),
             ]);
 
         return redirect()->route('admin.rashewan.index')->with('success', 'Ras hewan berhasil diperbarui.');
@@ -131,8 +130,6 @@ class RasHewanController extends Controller
         return DB::table('ras_hewan')->insert([
             'nama_ras' => $this->formatNamaRas($data['nama_ras']),
             'idjenis_hewan' => $data['idjenis_hewan'],
-            'created_at' => now(), 
-            'updated_at' => now(),
         ]);
     }
 

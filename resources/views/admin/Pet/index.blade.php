@@ -62,10 +62,25 @@
                                             <td>{{ $pet->tanggal_lahir ?? 'N/A' }}</td>
                                             <td>{{ $pet->warna_tanda }}</td>
                                             <td>
-                                                @if($pet->jenis_kelamin == 'J')
+                                                @php
+                                                    $jk = strtolower(trim($pet->jenis_kelamin ?? ''));
+                                                @endphp
+
+                                                @if(in_array($jk, ['l','j','m','male','jantan','j']))
                                                     <span class="badge bg-primary">Jantan</span>
-                                                @else
+                                                @elseif(in_array($jk, ['p','b','f','female','betina','b']))
                                                     <span class="badge bg-danger">Betina</span>
+                                                @elseif($jk !== '')
+                                                    @php $first = substr($jk, 0, 1); @endphp
+                                                    @if(in_array($first, ['l','j','m']))
+                                                        <span class="badge bg-primary">Jantan</span>
+                                                    @elseif(in_array($first, ['p','b','f']))
+                                                        <span class="badge bg-danger">Betina</span>
+                                                    @else
+                                                        <span class="badge bg-secondary">-</span>
+                                                    @endif
+                                                @else
+                                                    <span class="badge bg-secondary">-</span>
                                                 @endif
                                             </td>
                                             <td>{{ $pet->pemilik_nama ?? 'N/A' }}</td>

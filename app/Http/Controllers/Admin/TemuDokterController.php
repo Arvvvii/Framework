@@ -14,7 +14,7 @@ class TemuDokterController extends Controller
      */
     public function index()
     {
-        $temuDokter = TemuDokter::with('pet.pemilik.user', 'pet.rasHewan')
+        $temuDokter = TemuDokter::with('pet.pemilik.user', 'pet.rasHewan', 'rekamMedis')
             ->orderBy('waktu_daftar', 'desc')
             ->get();
         return view('admin.TemuDokter.index', compact('temuDokter'));
@@ -37,13 +37,21 @@ class TemuDokterController extends Controller
         $request->validate([
             'idpet' => 'required|exists:pet,idpet',
             'waktu_daftar' => 'required|date',
-            'keluhan' => 'required|string',
+            // keluhan is optional because the database may not contain the column
+            'keluhan' => 'nullable|string',
         ]);
+
+        // Try to determine the current user's `role_user` record so we can
+        // populate the required `idrole_user` column. In typical setups the
+        // authenticated admin will have an associated `role_user` record.
+        $roleUser = auth()->user() ? auth()->user()->roleUsers()->first() : null;
 
         TemuDokter::create([
             'idpet' => $request->idpet,
             'waktu_daftar' => $request->waktu_daftar,
-            'keluhan' => $request->keluhan,
+            'idrole_user' => $roleUser->idrole_user ?? null,
+            // intentionally not persisting 'keluhan' to avoid SQL error when
+            // the `temu_dokter` table lacks that column
         ]);
 
         return redirect()->route('admin.temudokter.index')->with('success', 'Temu dokter berhasil dibuat!');
@@ -67,14 +75,14 @@ class TemuDokterController extends Controller
         $request->validate([
             'idpet' => 'required|exists:pet,idpet',
             'waktu_daftar' => 'required|date',
-            'keluhan' => 'required|string',
+            'keluhan' => 'nullable|string',
         ]);
 
         $temuDokter = TemuDokter::findOrFail($id);
         $temuDokter->update([
             'idpet' => $request->idpet,
             'waktu_daftar' => $request->waktu_daftar,
-            'keluhan' => $request->keluhan,
+            // not updating 'keluhan' to avoid writing to a non-existent column
         ]);
 
         return redirect()->route('admin.temudokter.index')->with('success', 'Temu dokter berhasil diupdate!');

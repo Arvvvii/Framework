@@ -10,6 +10,13 @@ class KategoriKlinis extends Model
     use HasFactory;
 
     /**
+     * Disable automatic timestamps; table doesn't have created_at/updated_at.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
+
+    /**
      * The table associated with the model.
      *
      * @var string

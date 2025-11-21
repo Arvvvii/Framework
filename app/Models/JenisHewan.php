@@ -10,6 +10,12 @@ class JenisHewan extends Model
     use HasFactory;
 
     /**
+     * The table does not have `created_at`/`updated_at` columns in the schema dump.
+     * Disable automatic timestamps to avoid SQL errors when inserting records.
+     */
+    public $timestamps = false;
+
+    /**
      * The table associated with the model.
      *
      * @var string

@@ -87,8 +87,7 @@ class RekamMedisController extends Controller
             'diagnosa' => $validated['diagnosa'] ?? null,
             'dokter_pemeriksa' => $validated['dokter_pemeriksa'],
             'idreservasi_dokter' => $validated['idreservasi_dokter'],
-            'created_at' => now(), // Tambahkan manual jika kolom ada
-            'updated_at' => now(), // Tambahkan manual jika kolom ada
+            // table `rekam_medis` in this project doesn't include timestamp columns
         ]);
 
         return redirect()->route('admin.rekammedis.index')->with('success', 'Rekam medis berhasil ditambahkan.');
@@ -156,7 +155,6 @@ class RekamMedisController extends Controller
                 'diagnosa' => $validated['diagnosa'] ?? null,
                 'dokter_pemeriksa' => $validated['dokter_pemeriksa'],
                 'idreservasi_dokter' => $validated['idreservasi_dokter'],
-                'updated_at' => now(), // Tambahkan manual jika kolom ada
             ]);
 
         return redirect()->route('admin.rekammedis.index')->with('success', 'Rekam medis berhasil diperbarui.');

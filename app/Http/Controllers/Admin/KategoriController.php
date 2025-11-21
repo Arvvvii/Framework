@@ -88,7 +88,6 @@ class KategoriController extends Controller
             ->where('idkategori', $idkategori)
             ->update([
                 'nama_kategori' => $this->formatNamaKategori($validated['nama_kategori']),
-                'updated_at' => now(), // Tambahkan manual jika kolom ada
             ]);
 
         return redirect()->route('admin.kategori.index')->with('success', 'Kategori berhasil diperbarui.');
@@ -134,8 +133,6 @@ class KategoriController extends Controller
         // GANTI: Menggunakan Query Builder untuk INSERT
         return DB::table('kategori')->insert([
             'nama_kategori' => $this->formatNamaKategori($data['nama_kategori']),
-            'created_at' => now(), // Tambahkan manual jika kolom ada
-            'updated_at' => now(), // Tambahkan manual jika kolom ada
         ]);
     }
 

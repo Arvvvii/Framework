@@ -72,11 +72,11 @@ class RoleController extends Controller
         $validated = $this->validateRole($request, $idrole);
 
         // GANTI: $role->update([...]);
+        // Update only existing columns; the `role` table does not have timestamp columns.
         DB::table('role')
             ->where('idrole', $idrole)
             ->update([
                 'nama_role' => $this->formatNamaRole($validated['nama_role']),
-                'updated_at' => now(), // Tambahkan manual jika kolom ada
             ]);
 
         return redirect()->route('admin.role.index')->with('success', 'Role berhasil diperbarui.');
@@ -118,10 +118,9 @@ class RoleController extends Controller
     protected function createRole(array $data)
     {
         // GANTI: Menggunakan Query Builder untuk INSERT
+        // Insert only the columns that exist on the table (no timestamps).
         return DB::table('role')->insert([
             'nama_role' => $this->formatNamaRole($data['nama_role']),
-            'created_at' => now(), // Tambahkan manual jika kolom ada
-            'updated_at' => now(), // Tambahkan manual jika kolom ada
         ]);
     }
 

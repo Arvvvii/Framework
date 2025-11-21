@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h1>Tambah Pemilik</h1>
+    <h1>Edit Pemilik</h1>
 
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -14,17 +14,18 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.pemilik.store') }}" method="post">
+    <form action="{{ route('admin.pemilik.update', optional($pemilik)->idpemilik) }}" method="post">
         @csrf
+        @method('PUT')
 
         <div class="mb-3">
             <label for="no_wa" class="form-label">No. WA</label>
-            <input type="text" name="no_wa" id="no_wa" value="{{ old('no_wa') }}" class="form-control">
+            <input type="text" name="no_wa" id="no_wa" value="{{ old('no_wa', $pemilik->no_wa ?? '') }}" class="form-control">
         </div>
 
         <div class="mb-3">
             <label for="alamat" class="form-label">Alamat</label>
-            <input type="text" name="alamat" id="alamat" value="{{ old('alamat') }}" class="form-control">
+            <input type="text" name="alamat" id="alamat" value="{{ old('alamat', $pemilik->alamat ?? '') }}" class="form-control">
         </div>
 
         <div class="mb-3">
@@ -32,7 +33,7 @@
             <select name="iduser" id="iduser" class="form-control">
                 <option value="">-- Pilih User --</option>
                 @foreach($users as $u)
-                    <option value="{{ $u->iduser }}" {{ old('iduser') == $u->iduser ? 'selected' : '' }}>
+                    <option value="{{ $u->iduser }}" {{ (old('iduser', $pemilik->iduser ?? '') == $u->iduser) ? 'selected' : '' }}>
                         {{ $u->nama ?? ('User #' . $u->iduser) }}
                     </option>
                 @endforeach

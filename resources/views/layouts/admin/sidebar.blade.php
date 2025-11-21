@@ -86,13 +86,13 @@
 						</li>
 						<li class="nav-item">
 							<a href="{{ route('admin.dokter.index') }}" class="nav-link {{ request()->routeIs('admin.dokter.*') ? 'active' : '' }}">
-								<i class="nav-icon fas fa-stethoscope"></i>
+								<i class="nav-icon bi bi-circle"></i>
 								<p>Dokter</p>
 							</a>
 						</li>
 						<li class="nav-item">
 							<a href="{{ route('admin.perawat.index') }}" class="nav-link {{ request()->routeIs('admin.perawat.*') ? 'active' : '' }}">
-								<i class="nav-icon fas fa-user-nurse"></i>
+								<i class="nav-icon bi bi-circle"></i>
 								<p>Perawat</p>
 							</a>
 						</li>

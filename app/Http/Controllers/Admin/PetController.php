@@ -48,7 +48,8 @@ class PetController extends Controller
             'nama' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
             'warna_tanda' => 'nullable|string|max:255',
-            'jenis_kelamin' => 'required|in:Jantan,Betina',
+            // Store gender as single-character code to match DB (L = Laki / P = Perempuan)
+            'jenis_kelamin' => 'required|in:L,P',
             'idpemilik' => 'required|exists:pemilik,idpemilik',
             'idras_hewan' => 'required|exists:ras_hewan,idras_hewan',
         ]);
