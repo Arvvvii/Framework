@@ -61,14 +61,19 @@
                                         <tr class="align-middle">
                                             <td>{{ $loop->iteration }}</td>
                                             <td>
-                                                <small>{{ $rekam->created_at ? \Carbon\Carbon::parse($rekam->created_at)->format('d M Y') : 'N/A' }}</small>
+                                                <small>
+                                                    @php
+                                                        $date = $rekam->created_at ?? $rekam->waktu_daftar ?? null;
+                                                    @endphp
+                                                    {{ $date ? \Carbon\Carbon::parse($date)->format('d M Y') : 'N/A' }}
+                                                </small>
                                             </td>
                                             <td>{{ Str::limit($rekam->anamnesa, 30) }}</td>
                                             <td>{{ Str::limit($rekam->temuan_klinis, 30) }}</td>
                                             <td>{{ Str::limit($rekam->diagnosa, 30) }}</td>
                                             <td>{{ $rekam->dokter_nama ?? 'N/A' }}</td>
                                             <td>{{ $rekam->pet_nama ?? 'N/A' }}</td>
-                                            <td>{{ $rekam->pemilik_id ?? 'N/A' }}</td>
+                                            <td>{{ $rekam->pemilik_nama ?? 'N/A' }}</td>
                                             <td>{{ $rekam->ras_hewan_nama ?? 'N/A' }}</td>
                                             <td>
                                                 <a href="{{ route('admin.rekammedis.edit', $rekam->idrekam_medis) }}" class="btn btn-sm btn-warning">

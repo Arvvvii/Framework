@@ -22,8 +22,8 @@ class DashboardController extends Controller
         $stats = [
             'total_users' => DB::table('user')->count(),
             'total_roles' => DB::table('role')->count(),
-            'total_pets' => DB::table('pet')->count(),
-            'total_pemilik' => DB::table('pemilik')->count(),
+            'total_pets' => DB::table('pet')->where(function($q){ $q->where('is_deleted', 0)->orWhereNull('is_deleted'); })->count(),
+            'total_pemilik' => DB::table('pemilik')->where(function($q){ $q->where('is_deleted', 0)->orWhereNull('is_deleted'); })->count(),
             'total_kategori' => DB::table('kategori')->count(),
             'total_kategori_klinis' => DB::table('kategori_klinis')->count(),
             'total_jenis_hewan' => DB::table('jenis_hewan')->count(),
@@ -38,6 +38,8 @@ class DashboardController extends Controller
         $recent_pets = DB::table('pet AS p')
             ->leftJoin('pemilik AS pm', 'p.idpemilik', '=', 'pm.idpemilik')
             ->select('p.*', 'pm.no_wa AS pemilik_no_wa', 'pm.alamat AS pemilik_alamat') // Ambil data pemilik
+            ->where(function($q){ $q->where('p.is_deleted', 0)->orWhereNull('p.is_deleted'); })
+            ->where(function($q){ $q->where('pm.is_deleted', 0)->orWhereNull('pm.is_deleted'); })
             ->orderBy('idpet', 'desc')
             ->limit(5)
             ->get();

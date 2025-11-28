@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Pemilik;
 use App\Models\DataUser;
 use App\Models\RoleUser;
+use App\Models\Pet;
+use App\Models\TemuDokter;
+use App\Models\RekamMedis;
+use Illuminate\Support\Facades\DB as FacadesDB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -130,24 +134,50 @@ class PemilikController extends Controller
      */
     public function destroy($id)
     {
-        DB::beginTransaction();
+        FacadesDB::beginTransaction();
         try {
-            $pemilik = Pemilik::findOrFail($id);
-            $userId = $pemilik->iduser;
+            $pemilik = Pemilik::with('user.roleUsers')->findOrFail($id);
+            $user = $pemilik->user;
 
-            // Delete Pemilik
-            $pemilik->delete();
+            // mark pets and related data as deleted
+            $pets = $pemilik->pets()->get();
+            foreach ($pets as $p) {
+                foreach ($p->temuDokter()->get() as $t) {
+                    foreach ($t->rekamMedis()->get() as $rm) {
+                        $rm->markDeleted();
+                    }
+                    $t->markDeleted();
+                }
+                $p->markDeleted();
+            }
 
-            // Delete RoleUser
-            RoleUser::where('iduser', $userId)->delete();
+            // mark pemilik
+            $pemilik->markDeleted();
 
-            // Delete DataUser
-            DataUser::where('iduser', $userId)->delete();
+            // mark role_user entries
+            if ($user) {
+                foreach ($user->roleUsers()->get() as $ru) {
+                    $ru->markDeleted();
+                }
 
-            DB::commit();
+                // Only mark the user if the `user` table actually has `is_deleted` column.
+                // markDeleted() falls back to hard delete when column missing, which breaks FK constraints.
+                try {
+                    $userTable = $user->getTable();
+                    if (\Illuminate\Support\Facades\Schema::hasColumn($userTable, 'is_deleted')) {
+                        $user->markDeleted();
+                    } else {
+                        // skip deleting user to avoid FK constraint; keep user row intact
+                    }
+                } catch (\Throwable $e) {
+                    // if any error checking schema, skip deleting user for safety
+                }
+            }
+
+            FacadesDB::commit();
             return redirect()->route('resepsionis.pemilik.index')->with('success', 'Pemilik berhasil dihapus!');
         } catch (\Exception $e) {
-            DB::rollBack();
+            FacadesDB::rollBack();
             return back()->with('error', 'Gagal menghapus pemilik: ' . $e->getMessage());
         }
     }

@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Pet;
 use App\Models\Pemilik;
 use App\Models\RasHewan;
+use App\Models\TemuDokter;
+use App\Models\RekamMedis;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PetController extends Controller
 {
@@ -98,9 +101,28 @@ class PetController extends Controller
      */
     public function destroy($id)
     {
-        $pet = Pet::findOrFail($id);
-        $pet->delete();
+        DB::beginTransaction();
+        try {
+            $pet = Pet::findOrFail($id);
 
-        return redirect()->route('resepsionis.pet.index')->with('success', 'Pet berhasil dihapus!');
+            // use is_deleted flag soft-delete; cascade handled below
+            // delete related temu_dokter and rekam_medis first
+            $temu = $pet->temuDokter()->get();
+            foreach ($temu as $t) {
+                // mark related rekam_medis as deleted
+                foreach ($t->rekamMedis()->get() as $rm) {
+                    $rm->markDeleted();
+                }
+                $t->markDeleted();
+            }
+
+            $pet->markDeleted();
+
+            DB::commit();
+            return redirect()->route('resepsionis.pet.index')->with('success', 'Pet berhasil dihapus!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal menghapus pet: ' . $e->getMessage());
+        }
     }
 }

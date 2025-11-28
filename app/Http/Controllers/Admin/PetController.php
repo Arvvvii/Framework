@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 // use App\Models\Pet; // Hapus atau jadikan komentar
+use App\Models\Pet;
 use App\Models\Pemilik; // Tetap diperlukan untuk create/edit form
 use App\Models\RasHewan; // Tetap diperlukan untuk create/edit form
 use Illuminate\Http\Request;
@@ -24,6 +25,9 @@ class PetController extends Controller
             ->leftJoin('user AS u', 'pm.iduser', '=', 'u.iduser')
             ->leftJoin('ras_hewan AS rh', 'p.idras_hewan', '=', 'rh.idras_hewan')
             ->select('p.*', 'pm.no_wa AS pemilik_no_wa', 'pm.alamat AS pemilik_alamat', 'u.nama AS pemilik_nama', 'rh.nama_ras')
+            ->where(function($q){
+                $q->where('p.is_deleted', 0)->orWhereNull('p.is_deleted');
+            })
             ->get();
             
         return view('admin.Pet.index', compact('pets'));
@@ -71,7 +75,10 @@ class PetController extends Controller
      */
     public function show($idpet) // Model Binding diganti
     {
-        $pet = DB::table('pet')->where('idpet', $idpet)->first();
+        $pet = DB::table('pet')->where('idpet', $idpet)
+            ->where(function($q){
+                $q->where('is_deleted', 0)->orWhereNull('is_deleted');
+            })->first();
         if (!$pet) {
             abort(404);
         }
@@ -84,7 +91,10 @@ class PetController extends Controller
      */
     public function edit($idpet) // Model Binding diganti
     {
-        $pet = DB::table('pet')->where('idpet', $idpet)->first();
+        $pet = DB::table('pet')->where('idpet', $idpet)
+            ->where(function($q){
+                $q->where('is_deleted', 0)->orWhereNull('is_deleted');
+            })->first();
         if (!$pet) {
             abort(404);
         }
@@ -127,9 +137,28 @@ class PetController extends Controller
      */
     public function destroy($idpet) // Model Binding diganti
     {
-        // GANTI: $pet->delete();
-        DB::table('pet')->where('idpet', $idpet)->delete();
+        // Use model to perform safe cascade using is_deleted flag where applicable
+        \DB::beginTransaction();
+        try {
+            $pet = Pet::findOrFail($idpet);
 
-        return redirect()->route('admin.pet.index')->with('success', 'Pet deleted successfully.');
+            // mark related temu_dokter and rekam_medis
+            $temu = $pet->temuDokter()->get();
+            foreach ($temu as $t) {
+                foreach ($t->rekamMedis()->get() as $rm) {
+                    $rm->markDeleted();
+                }
+                $t->markDeleted();
+            }
+
+            // mark pet
+            $pet->markDeleted();
+
+            \DB::commit();
+            return redirect()->route('admin.pet.index')->with('success', 'Pet deleted successfully.');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return back()->with('error', 'Failed to delete pet: ' . $e->getMessage());
+        }
     }
 }

@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\IsDeletedFlag;
 
 class TemuDokter extends Model
 {
     use HasFactory;
+    use IsDeletedFlag;
 
     /**
      * Disable automatic timestamps because `temu_dokter` table does not have
@@ -40,6 +42,9 @@ class TemuDokter extends Model
         'status',
         'idpet',
         'idrole_user',
+        // keluhan mungkin tidak ada di semua instalasi (tidak melakukan migrate),
+        // tetapi jika kolom ada kita ingin mampu melakukan mass-assignment.
+        'keluhan',
     ];
 
     /**
@@ -74,4 +79,6 @@ class TemuDokter extends Model
     {
         return $this->hasMany(RekamMedis::class, 'idreservasi_dokter', 'idreservasi_dokter');
     }
+
+    // cascade behavior handled via controllers using markDeleted()
 }

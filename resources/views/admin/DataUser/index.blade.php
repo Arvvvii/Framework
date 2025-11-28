@@ -46,6 +46,7 @@
                                     <th style="width: 10px">#</th>
                                     <th>Nama</th>
                                     <th>Email</th>
+                                    <th>Role</th>
                                     <th style="width: 200px">Aksi</th>
                                 </tr>
                             </thead>
@@ -55,6 +56,7 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $datauser->nama }}</td>
                                         <td>{{ $datauser->email }}</td>
+                                        <td>{{ $datauser->role_name ?? 'N/A' }}</td>
                                         <td>
                                             <a href="{{ route('admin.datauser.edit', $datauser->iduser) }}" class="btn btn-sm btn-warning">
                                                 <i class="bi bi-pencil-square"></i> Edit
@@ -68,9 +70,9 @@
                                             </form>
                                         </td>
                                     </tr>
-                                @empty
+                                    @empty
                                     <tr>
-                                        <td colspan="4" class="text-center">Tidak ada data user.</td>
+                                        <td colspan="5" class="text-center">Tidak ada data user.</td>
                                     </tr>
                                 @endforelse
                             </tbody>

@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\IsDeletedFlag;
 
 class Pemilik extends Model
 {
     use HasFactory;
+    use IsDeletedFlag;
 
     public $timestamps = false;
 
@@ -51,4 +53,6 @@ class Pemilik extends Model
     {
         return $this->hasMany(Pet::class, 'idpemilik', 'idpemilik');
     }
+
+    // cascade behavior handled in controllers using markDeleted()
 }

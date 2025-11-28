@@ -15,14 +15,21 @@ class DataUserController extends Controller
     public function index()
     {
         // GANTI: $datausers = DataUser::all();
-        $datausers = DB::table('user')->get();
+        // Ambil juga role (jika ada) melalui tabel role_user -> role
+        $datausers = DB::table('user as u')
+            ->leftJoin('role_user as ru', 'u.iduser', '=', 'ru.iduser')
+            ->leftJoin('role as r', 'ru.idrole', '=', 'r.idrole')
+            ->select('u.*', 'r.nama_role as role_name')
+            ->get();
         return view('admin.DataUser.index', compact('datausers'));
     }
 
 
     public function create()
     {
-        return view('admin.DataUser.create');
+        // Ambil daftar role yang tersedia untuk dropdown (jangan migrate)
+        $roles = DB::table('role')->get();
+        return view('admin.DataUser.create', compact('roles'));
     }
 
     /**
@@ -31,8 +38,16 @@ class DataUserController extends Controller
     public function store(Request $request)
     {
         $validated = $this->validateDataUser($request);
+        $newId = $this->createDataUser($validated);
 
-        $this->createDataUser($validated);
+        // jika role dipilih, masukkan ke tabel role_user
+        if ($request->filled('role_id')) {
+            DB::table('role_user')->insert([
+                'iduser' => $newId,
+                'idrole' => $request->input('role_id'),
+                'status' => 1,
+            ]);
+        }
 
         return redirect()->route('admin.datauser.index')->with('success', 'Pengguna berhasil ditambahkan.');
     }
@@ -60,7 +75,13 @@ class DataUserController extends Controller
         if (!$datauser) {
             abort(404);
         }
-        return view('admin.DataUser.edit', compact('datauser'));
+        // Ambil semua role untuk select
+        $roles = DB::table('role')->get();
+        // Ambil role_user (jika ada) untuk user ini
+        $roleUser = DB::table('role_user')->where('iduser', $idDataUser)->first();
+        $currentRoleId = $roleUser->idrole ?? null;
+
+        return view('admin.DataUser.edit', compact('datauser', 'roles', 'currentRoleId'));
     }
 
     /**
@@ -81,6 +102,23 @@ class DataUserController extends Controller
 
         // GANTI: $datauser->update($updateData);
         DB::table('user')->where('iduser', $idDataUser)->update($updateData);
+
+        // Update atau insert role_user jika role dipilih
+        if ($request->filled('role_id')) {
+            $existing = DB::table('role_user')->where('iduser', $idDataUser)->first();
+            if ($existing) {
+                DB::table('role_user')->where('iduser', $idDataUser)->update([
+                    'idrole' => $request->input('role_id'),
+                    'status' => 1,
+                ]);
+            } else {
+                DB::table('role_user')->insert([
+                    'iduser' => $idDataUser,
+                    'idrole' => $request->input('role_id'),
+                    'status' => 1,
+                ]);
+            }
+        }
 
         return redirect()->route('admin.datauser.index')->with('success', 'Pengguna berhasil diperbarui.');
     }
@@ -105,7 +143,7 @@ class DataUserController extends Controller
             : 'unique:user,email';
 
         $rules = [
-            'nama' => ['required', 'string', 'min:3', 'max:255'],
+            'nama' => ['required', 'string', 'min:2', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', $uniqueEmail],
         ];
 
@@ -114,6 +152,9 @@ class DataUserController extends Controller
         } else {
             $rules['password'] = ['required', 'string', 'min:6', 'confirmed'];
         }
+
+        // optional role id (if present, must exist in role table)
+        $rules['role_id'] = ['nullable', 'integer'];
 
         return $request->validate($rules, [
             'nama.required' => 'Nama wajib diisi.',
@@ -130,8 +171,8 @@ class DataUserController extends Controller
      */
     protected function createDataUser(array $data)
     {
-        // GANTI: return DataUser::create([...]);
-        return DB::table('user')->insert([
+        // Insert dan kembalikan id yang baru dibuat
+        return DB::table('user')->insertGetId([
             'nama' => $data['nama'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),

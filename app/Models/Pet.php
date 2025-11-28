@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\IsDeletedFlag;
 
 class Pet extends Model
 {
     use HasFactory;
+    use IsDeletedFlag;
 
     /**
      * Disable automatic timestamps because `pet` table does not have
@@ -83,4 +85,6 @@ class Pet extends Model
     {
         return $this->hasMany(TemuDokter::class, 'idpet', 'idpet');
     }
+
+    // cascade behavior is handled by controllers or related models via markDeleted()
 }

@@ -21,6 +21,9 @@ class PemilikController extends Controller
         $pemiliks = DB::table('pemilik AS pm')
             ->leftJoin('user AS u', 'pm.iduser', '=', 'u.iduser')
             ->select('pm.*', 'u.nama AS user_nama', 'u.email AS user_email') // Ambil nama & email user
+            ->where(function($q){
+                $q->where('pm.is_deleted', 0)->orWhereNull('pm.is_deleted');
+            })
             ->get();
             
         return view('admin.Pemilik.index', compact('pemiliks'));
@@ -63,7 +66,11 @@ class PemilikController extends Controller
      */
     public function show($idpemilik) // Model Binding diganti
     {
-        $pemilik = DB::table('pemilik')->where('idpemilik', $idpemilik)->first();
+        $pemilik = DB::table('pemilik')
+            ->where('idpemilik', $idpemilik)
+            ->where(function($q){
+                $q->where('is_deleted', 0)->orWhereNull('is_deleted');
+            })->first();
         if (!$pemilik) {
             abort(404);
         }
@@ -75,7 +82,11 @@ class PemilikController extends Controller
      */
     public function edit($idpemilik) // Model Binding diganti
     {
-        $pemilik = DB::table('pemilik')->where('idpemilik', $idpemilik)->first();
+        $pemilik = DB::table('pemilik')
+            ->where('idpemilik', $idpemilik)
+            ->where(function($q){
+                $q->where('is_deleted', 0)->orWhereNull('is_deleted');
+            })->first();
         if (!$pemilik) {
             abort(404);
         }

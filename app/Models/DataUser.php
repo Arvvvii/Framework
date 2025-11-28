@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable; 
 use Illuminate\Notifications\Notifiable;
+use App\Models\Traits\IsDeletedFlag;
 
 // PENTING: Class harus MENG-EXTEND Authenticatable agar bisa digunakan untuk Login/Auth
 class DataUser extends Authenticatable 
 {
     use HasFactory, Notifiable;
+    use IsDeletedFlag;
 
     public $timestamps = false; // Mengabaikan kolom created_at dan updated_at
 

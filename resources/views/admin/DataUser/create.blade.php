@@ -37,6 +37,16 @@
             <input type="password" name="password_confirmation" id="password_confirmation" class="form-control">
         </div>
 
+        <div class="mb-3">
+            <label for="role_id" class="form-label">Role</label>
+            <select name="role_id" id="role_id" class="form-control">
+                <option value="">-- Pilih Role (opsional) --</option>
+                @foreach($roles as $role)
+                    <option value="{{ $role->idrole }}">{{ $role->nama_role }}</option>
+                @endforeach
+            </select>
+        </div>
+
         <button type="submit" class="btn btn-primary">Simpan</button>
         <a href="{{ route('admin.datauser.index') }}" class="btn btn-secondary">Batal</a>
     </form>

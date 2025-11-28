@@ -44,8 +44,13 @@
                                 <input type="datetime-local" name="waktu_daftar" id="waktu_daftar" class="form-control" required>
                             </div>
                             <div class="mb-3">
-                                <label for="keluhan" class="form-label">Keluhan</label>
-                                <textarea name="keluhan" id="keluhan" class="form-control" rows="3" required></textarea>
+                                <label for="idrole_user" class="form-label">Pilih Dokter (opsional)</label>
+                                <select name="idrole_user" id="idrole_user" class="form-control">
+                                    <option value="">-- Pilih Dokter --</option>
+                                    @foreach($dokters as $dok)
+                                        <option value="{{ $dok->idrole_user }}">{{ $dok->user->nama ?? 'N/A' }} - {{ $dok->role->nama_role ?? '' }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                         <div class="card-footer text-end">

@@ -47,7 +47,7 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Tanggal</th>
-                                    <th>Keluhan</th>
+                                    <th>Dokter</th>
                                     <th>Nama Hewan</th>
                                     <th>Pemilik</th>
                                     <th>Ras Hewan</th>
@@ -62,12 +62,7 @@
                                             {{ $td->waktu_daftar?->format('d-m-Y H:i') ?? 'N/A' }}<br>
                                             <small class="text-muted">{{ $td->waktu_daftar?->diffForHumans() }}</small>
                                         </td>
-                                        <td>
-                                            @php
-                                                $kel = $td->keluhan ?? optional($td->rekamMedis->first())->anamnesa;
-                                            @endphp
-                                            {{ Str::limit($kel ?? 'N/A', 50) }}
-                                        </td>
+                                        <td>{{ $td->dokter_name ?? 'N/A' }}</td>
                                         <td>{{ $td->pet->nama ?? 'N/A' }}</td>
                                         <td>{{ $td->pet->pemilik->user->nama ?? 'N/A' }}</td>
                                         <td>{{ $td->pet->rasHewan->nama_ras ?? 'N/A' }}</td>
