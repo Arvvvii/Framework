@@ -21,6 +21,7 @@ class RasHewanController extends Controller
         $rashewans = DB::table('ras_hewan AS rh')
             ->leftJoin('jenis_hewan AS jh', 'rh.idjenis_hewan', '=', 'jh.idjenis_hewan')
             ->select('rh.*', 'jh.nama_jenis_hewan') // Tambahkan kolom relasi yang dibutuhkan
+            ->whereNull('rh.deleted_at')
             ->get();
             
         return view('admin.RasHewan.index', compact('rashewans'));
@@ -52,7 +53,7 @@ class RasHewanController extends Controller
      */
     public function show($idras_hewan) // Model Binding diganti
     {
-        $rashewan = DB::table('ras_hewan')->where('idras_hewan', $idras_hewan)->first();
+        $rashewan = DB::table('ras_hewan')->where('idras_hewan', $idras_hewan)->whereNull('deleted_at')->first();
         if (!$rashewan) {
             abort(404);
         }
@@ -64,7 +65,7 @@ class RasHewanController extends Controller
      */
     public function edit($idras_hewan) // Model Binding diganti
     {
-        $rashewan = DB::table('ras_hewan')->where('idras_hewan', $idras_hewan)->first();
+        $rashewan = DB::table('ras_hewan')->where('idras_hewan', $idras_hewan)->whereNull('deleted_at')->first();
         if (!$rashewan) {
             abort(404);
         }
@@ -97,7 +98,10 @@ class RasHewanController extends Controller
     public function destroy($idras_hewan) // Model Binding diganti
     {
         // GANTI: $rashewan->delete();
-        DB::table('ras_hewan')->where('idras_hewan', $idras_hewan)->delete();
+        DB::table('ras_hewan')->where('idras_hewan', $idras_hewan)->update([
+            'deleted_at' => now(),
+            'deleted_by' => auth()->id() ?? null,
+        ]);
 
         return redirect()->route('admin.rashewan.index')->with('success', 'RasHewan deleted successfully.');
     }
@@ -131,6 +135,18 @@ class RasHewanController extends Controller
             'nama_ras' => $this->formatNamaRas($data['nama_ras']),
             'idjenis_hewan' => $data['idjenis_hewan'],
         ]);
+    }
+
+    /**
+     * Restore a soft-deleted ras_hewan
+     */
+    public function restore($idras_hewan)
+    {
+        DB::table('ras_hewan')->where('idras_hewan', $idras_hewan)->update([
+            'deleted_at' => null,
+            'deleted_by' => null,
+        ]);
+        return redirect()->route('admin.rashewan.index')->with('success', 'Ras hewan restored successfully.');
     }
 
     protected function formatNamaRas(string $nama)

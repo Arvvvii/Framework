@@ -17,7 +17,7 @@ class KategoriKlinisController extends Controller
     {
         // GANTI: $kategorikliniss = KategoriKlinis::all();
         // Menggunakan Query Builder
-        $kategorikliniss = DB::table('kategori_klinis')->get();
+        $kategorikliniss = DB::table('kategori_klinis')->whereNull('deleted_at')->get();
         
         return view('admin.KategoriKlinis.index', compact('kategorikliniss'));
     }
@@ -50,7 +50,7 @@ class KategoriKlinisController extends Controller
     public function show($idkategori_klinis)
     {
         // Menggunakan Query Builder untuk ambil 1 data
-        $kategoriklinis = DB::table('kategori_klinis')->where('idkategori_klinis', $idkategori_klinis)->first();
+        $kategoriklinis = DB::table('kategori_klinis')->where('idkategori_klinis', $idkategori_klinis)->whereNull('deleted_at')->first();
 
         if (!$kategoriklinis) {
             abort(404);
@@ -66,7 +66,7 @@ class KategoriKlinisController extends Controller
     public function edit($idkategori_klinis)
     {
         // Menggunakan Query Builder untuk ambil 1 data
-        $kategoriklinis = DB::table('kategori_klinis')->where('idkategori_klinis', $idkategori_klinis)->first();
+        $kategoriklinis = DB::table('kategori_klinis')->where('idkategori_klinis', $idkategori_klinis)->whereNull('deleted_at')->first();
 
         if (!$kategoriklinis) {
             abort(404);
@@ -101,7 +101,10 @@ class KategoriKlinisController extends Controller
         // GANTI: Menggunakan Query Builder untuk delete
         DB::table('kategori_klinis')
             ->where('idkategori_klinis', $idkategori_klinis)
-            ->delete();
+            ->update([
+                'deleted_at' => now(),
+                'deleted_by' => auth()->id() ?? null,
+            ]);
 
         return redirect()->route('admin.kategoriklinis.index')->with('success', 'KategoriKlinis deleted successfully.');
     }
@@ -135,6 +138,18 @@ class KategoriKlinisController extends Controller
         return DB::table('kategori_klinis')->insert([
             'nama_kategori_klinis' => $this->formatNamaKategoriKlinis($data['nama_kategori_klinis']),
         ]);
+    }
+
+    /**
+     * Restore a soft-deleted kategori_klinis
+     */
+    public function restore($idkategori_klinis)
+    {
+        DB::table('kategori_klinis')->where('idkategori_klinis', $idkategori_klinis)->update([
+            'deleted_at' => null,
+            'deleted_by' => null,
+        ]);
+        return redirect()->route('admin.kategoriklinis.index')->with('success', 'Kategori klinis restored successfully.');
     }
 
     /**

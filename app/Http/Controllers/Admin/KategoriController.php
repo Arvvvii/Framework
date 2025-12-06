@@ -17,7 +17,7 @@ class KategoriController extends Controller
     {
         // GANTI: $kategoris = Kategori::all();
         // Menggunakan Query Builder
-        $kategoris = DB::table('kategori')->get();
+        $kategoris = DB::table('kategori')->whereNull('deleted_at')->get();
         
         // Output adalah stdClass Object, yang cocok dibaca oleh View Blade
         return view('admin.Kategori.index', compact('kategoris'));
@@ -51,7 +51,7 @@ class KategoriController extends Controller
     public function show($idkategori)
     {
         // Menggunakan Query Builder untuk ambil 1 data
-        $kategori = DB::table('kategori')->where('idkategori', $idkategori)->first();
+        $kategori = DB::table('kategori')->where('idkategori', $idkategori)->whereNull('deleted_at')->first();
                         
         if (!$kategori) {
             abort(404);
@@ -67,7 +67,7 @@ class KategoriController extends Controller
     public function edit($idkategori)
     {
         // Menggunakan Query Builder untuk ambil 1 data
-        $kategori = DB::table('kategori')->where('idkategori', $idkategori)->first();
+        $kategori = DB::table('kategori')->where('idkategori', $idkategori)->whereNull('deleted_at')->first();
 
         if (!$kategori) {
             abort(404);
@@ -101,7 +101,10 @@ class KategoriController extends Controller
         // GANTI: Menggunakan Query Builder untuk delete
         DB::table('kategori')
             ->where('idkategori', $idkategori)
-            ->delete();
+            ->update([
+                'deleted_at' => now(),
+                'deleted_by' => auth()->id() ?? null,
+            ]);
 
         return redirect()->route('admin.kategori.index')->with('success', 'Kategori deleted successfully.');
     }
@@ -134,6 +137,18 @@ class KategoriController extends Controller
         return DB::table('kategori')->insert([
             'nama_kategori' => $this->formatNamaKategori($data['nama_kategori']),
         ]);
+    }
+
+    /**
+     * Restore a soft-deleted kategori
+     */
+    public function restore($idkategori)
+    {
+        DB::table('kategori')->where('idkategori', $idkategori)->update([
+            'deleted_at' => null,
+            'deleted_by' => null,
+        ]);
+        return redirect()->route('admin.kategori.index')->with('success', 'Kategori restored successfully.');
     }
 
     /**

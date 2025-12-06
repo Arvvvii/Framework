@@ -16,7 +16,7 @@ class RoleController extends Controller
     public function index()
     {
         // GANTI: $roles = Role::all();
-        $roles = DB::table('role')->get();
+        $roles = DB::table('role')->whereNull('deleted_at')->get();
         return view('admin.Role.index', compact('roles'));
     }
 
@@ -45,7 +45,7 @@ class RoleController extends Controller
      */
     public function show($idrole) // Model Binding diganti
     {
-        $role = DB::table('role')->where('idrole', $idrole)->first();
+        $role = DB::table('role')->where('idrole', $idrole)->whereNull('deleted_at')->first();
         if (!$role) {
             abort(404);
         }
@@ -57,7 +57,7 @@ class RoleController extends Controller
      */
     public function edit($idrole) // Model Binding diganti
     {
-        $role = DB::table('role')->where('idrole', $idrole)->first();
+        $role = DB::table('role')->where('idrole', $idrole)->whereNull('deleted_at')->first();
         if (!$role) {
             abort(404);
         }
@@ -87,8 +87,11 @@ class RoleController extends Controller
      */
     public function destroy($idrole) // Model Binding diganti
     {
-        // GANTI: $role->delete();
-        DB::table('role')->where('idrole', $idrole)->delete();
+        // Soft-delete: set deleted_at and deleted_by
+        DB::table('role')->where('idrole', $idrole)->update([
+            'deleted_at' => now(),
+            'deleted_by' => auth()->id() ?? null,
+        ]);
 
         return redirect()->route('admin.role.index')->with('success', 'Role deleted successfully.');
     }
@@ -122,6 +125,18 @@ class RoleController extends Controller
         return DB::table('role')->insert([
             'nama_role' => $this->formatNamaRole($data['nama_role']),
         ]);
+    }
+
+    /**
+     * Restore a soft-deleted role
+     */
+    public function restore($idrole)
+    {
+        DB::table('role')->where('idrole', $idrole)->update([
+            'deleted_at' => null,
+            'deleted_by' => null,
+        ]);
+        return redirect()->route('admin.role.index')->with('success', 'Role restored successfully.');
     }
 
     protected function formatNamaRole(string $nama)

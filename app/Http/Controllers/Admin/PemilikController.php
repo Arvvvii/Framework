@@ -21,9 +21,7 @@ class PemilikController extends Controller
         $pemiliks = DB::table('pemilik AS pm')
             ->leftJoin('user AS u', 'pm.iduser', '=', 'u.iduser')
             ->select('pm.*', 'u.nama AS user_nama', 'u.email AS user_email') // Ambil nama & email user
-            ->where(function($q){
-                $q->where('pm.is_deleted', 0)->orWhereNull('pm.is_deleted');
-            })
+            ->whereNull('pm.deleted_at')
             ->get();
             
         return view('admin.Pemilik.index', compact('pemiliks'));
@@ -68,9 +66,8 @@ class PemilikController extends Controller
     {
         $pemilik = DB::table('pemilik')
             ->where('idpemilik', $idpemilik)
-            ->where(function($q){
-                $q->where('is_deleted', 0)->orWhereNull('is_deleted');
-            })->first();
+            ->whereNull('deleted_at')
+            ->first();
         if (!$pemilik) {
             abort(404);
         }
@@ -84,9 +81,8 @@ class PemilikController extends Controller
     {
         $pemilik = DB::table('pemilik')
             ->where('idpemilik', $idpemilik)
-            ->where(function($q){
-                $q->where('is_deleted', 0)->orWhereNull('is_deleted');
-            })->first();
+            ->whereNull('deleted_at')
+            ->first();
         if (!$pemilik) {
             abort(404);
         }
@@ -126,8 +122,23 @@ class PemilikController extends Controller
     public function destroy($idpemilik) // Model Binding diganti
     {
         // GANTI: $pemilik->delete();
-        DB::table('pemilik')->where('idpemilik', $idpemilik)->delete();
+        DB::table('pemilik')->where('idpemilik', $idpemilik)->update([
+            'deleted_at' => now(),
+            'deleted_by' => auth()->id() ?? null,
+        ]);
 
         return redirect()->route('admin.pemilik.index')->with('success', 'Pemilik deleted successfully.');
+    }
+
+    /**
+     * Restore a soft-deleted pemilik
+     */
+    public function restore($idpemilik)
+    {
+        DB::table('pemilik')->where('idpemilik', $idpemilik)->update([
+            'deleted_at' => null,
+            'deleted_by' => null,
+        ]);
+        return redirect()->route('admin.pemilik.index')->with('success', 'Pemilik restored successfully.');
     }
 }

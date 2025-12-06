@@ -38,6 +38,7 @@
         <div class="logo-bar">
             <div class="container">
                 <img src="{{ asset('https://rshp.unair.ac.id/wp-content/uploads/2024/06/UNIVERSITAS-AIRLANGGA-scaled.webp') }}" alt="Logo Universitas Airlangga" class="logo-unair">
+                
             </div>
         </div>
     </header>

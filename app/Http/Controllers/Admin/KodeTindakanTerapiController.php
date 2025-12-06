@@ -27,6 +27,7 @@ class KodeTindakanTerapiController extends Controller
                 'kat.nama_kategori', // Ambil nama kategori
                 'kk.nama_kategori_klinis' // Ambil nama kategori klinis
             )
+            ->whereNull('ktt.deleted_at')
             ->get();
             
         return view('admin.KodeTindakanTerapi.index', compact('kodeterapis'));
@@ -62,8 +63,9 @@ class KodeTindakanTerapiController extends Controller
     {
         // Query Builder untuk ambil 1 data utama
         $kodeterapi = DB::table('kode_tindakan_terapi')
-                        ->where('idkode_tindakan_terapi', $idkode_tindakan_terapi)
-                        ->first();
+                ->where('idkode_tindakan_terapi', $idkode_tindakan_terapi)
+                ->whereNull('deleted_at')
+                ->first();
                         
         if (!$kodeterapi) {
             abort(404);
@@ -80,8 +82,9 @@ class KodeTindakanTerapiController extends Controller
     public function edit($idkode_tindakan_terapi) // Model Binding diganti
     {
         $kodeterapi = DB::table('kode_tindakan_terapi')
-                        ->where('idkode_tindakan_terapi', $idkode_tindakan_terapi)
-                        ->first();
+                ->where('idkode_tindakan_terapi', $idkode_tindakan_terapi)
+                ->whereNull('deleted_at')
+                ->first();
                         
         if (!$kodeterapi) {
             abort(404);
@@ -120,7 +123,10 @@ class KodeTindakanTerapiController extends Controller
         // GANTI: Menggunakan Query Builder untuk delete
         DB::table('kode_tindakan_terapi')
             ->where('idkode_tindakan_terapi', $idkode_tindakan_terapi)
-            ->delete();
+            ->update([
+                'deleted_at' => now(),
+                'deleted_by' => auth()->id() ?? null,
+            ]);
 
         return redirect()->route('admin.kodeterapi.index')->with('success', 'KodeTindakanTerapi deleted successfully.');
     }
@@ -163,5 +169,17 @@ class KodeTindakanTerapiController extends Controller
             'idkategori' => $data['idkategori'],
             'idkategori_klinis' => $data['idkategori_klinis'],
         ]);
+    }
+
+    /**
+     * Restore a soft-deleted kode_tindakan_terapi
+     */
+    public function restore($idkode_tindakan_terapi)
+    {
+        DB::table('kode_tindakan_terapi')->where('idkode_tindakan_terapi', $idkode_tindakan_terapi)->update([
+            'deleted_at' => null,
+            'deleted_by' => null,
+        ]);
+        return redirect()->route('admin.kodeterapi.index')->with('success', 'Kode terapi restored successfully.');
     }
 }

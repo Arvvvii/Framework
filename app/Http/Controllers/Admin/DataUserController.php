@@ -20,6 +20,7 @@ class DataUserController extends Controller
             ->leftJoin('role_user as ru', 'u.iduser', '=', 'ru.iduser')
             ->leftJoin('role as r', 'ru.idrole', '=', 'r.idrole')
             ->select('u.*', 'r.nama_role as role_name')
+            ->whereNull('u.deleted_at')
             ->get();
         return view('admin.DataUser.index', compact('datausers'));
     }
@@ -28,7 +29,7 @@ class DataUserController extends Controller
     public function create()
     {
         // Ambil daftar role yang tersedia untuk dropdown (jangan migrate)
-        $roles = DB::table('role')->get();
+        $roles = DB::table('role')->whereNull('deleted_at')->get();
         return view('admin.DataUser.create', compact('roles'));
     }
 
@@ -58,7 +59,7 @@ class DataUserController extends Controller
     public function show($idDataUser) // Model Binding diganti
     {
         // Menggunakan Query Builder
-        $datauser = DB::table('user')->where('iduser', $idDataUser)->first();
+        $datauser = DB::table('user')->where('iduser', $idDataUser)->whereNull('deleted_at')->first();
         if (!$datauser) {
             abort(404);
         }
@@ -71,7 +72,7 @@ class DataUserController extends Controller
     public function edit($idDataUser) // Model Binding diganti
     {
         // Menggunakan Query Builder
-        $datauser = DB::table('user')->where('iduser', $idDataUser)->first();
+        $datauser = DB::table('user')->where('iduser', $idDataUser)->whereNull('deleted_at')->first();
         if (!$datauser) {
             abort(404);
         }
@@ -129,7 +130,10 @@ class DataUserController extends Controller
     public function destroy($idDataUser) // Model Binding diganti
     {
         // GANTI: $datauser->delete();
-        DB::table('user')->where('iduser', $idDataUser)->delete();
+        DB::table('user')->where('iduser', $idDataUser)->update([
+            'deleted_at' => now(),
+            'deleted_by' => auth()->id() ?? null,
+        ]);
 
         return redirect()->route('admin.datauser.index')->with('success', 'DataUser deleted successfully.');
     }
@@ -177,5 +181,17 @@ class DataUserController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
+    }
+
+    /**
+     * Restore a soft-deleted data user
+     */
+    public function restore($idDataUser)
+    {
+        DB::table('user')->where('iduser', $idDataUser)->update([
+            'deleted_at' => null,
+            'deleted_by' => null,
+        ]);
+        return redirect()->route('admin.datauser.index')->with('success', 'User restored successfully.');
     }
 }

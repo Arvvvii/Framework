@@ -31,8 +31,16 @@ class RekamMedisController extends Controller
         // This prevents showing 'Buat Rekam Medis' for pets that already have at least one rekam_medis
         $newReservations = TemuDokter::with('pet.pemilik.user', 'pet.rasHewan')
             ->whereDoesntHave('pet.rekamMedis')
+            // only show reservations created by resepsionis (role id 4)
+            ->whereHas('roleUser', function($q){
+                $q->where('idrole', 4);
+            })
             ->orderBy('waktu_daftar', 'desc')
-            ->get();
+            ->get()
+            // there may be multiple reservations for the same pet without rekam_medis;
+            // show only the most recent reservation per pet to avoid duplicate "Buat Rekam Medis" buttons
+            ->unique('idpet')
+            ->values();
 
         return view('perawat.RekamMedis.index', compact('rekamMedis', 'newReservations'));
     }

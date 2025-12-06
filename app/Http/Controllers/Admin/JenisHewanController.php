@@ -19,6 +19,7 @@ class JenisHewanController extends Controller
         // Menggunakan Query Builder
         $jenishawans = DB::table('jenis_hewan')
             ->select('idjenis_hewan', 'nama_jenis_hewan')
+            ->whereNull('deleted_at')
             ->get();
             
         // Output Query Builder adalah stdClass Object, yang cocok dibaca oleh View Blade
@@ -55,8 +56,9 @@ class JenisHewanController extends Controller
     {
         // Menggunakan Query Builder untuk ambil 1 data
         $jenishawan = DB::table('jenis_hewan')
-                        ->where('idjenis_hewan', $idjenis_hewan)
-                        ->first();
+                ->where('idjenis_hewan', $idjenis_hewan)
+                ->whereNull('deleted_at')
+                ->first();
                         
         if (!$jenishawan) {
             abort(404);
@@ -74,8 +76,9 @@ class JenisHewanController extends Controller
     {
         // Menggunakan Query Builder untuk ambil 1 data
         $jenishawan = DB::table('jenis_hewan')
-                        ->where('idjenis_hewan', $idjenis_hewan)
-                        ->first();
+                ->where('idjenis_hewan', $idjenis_hewan)
+                ->whereNull('deleted_at')
+                ->first();
 
         if (!$jenishawan) {
             abort(404);
@@ -111,7 +114,10 @@ class JenisHewanController extends Controller
         // GANTI: Menggunakan Query Builder untuk delete
         DB::table('jenis_hewan')
             ->where('idjenis_hewan', $idjenis_hewan)
-            ->delete();
+            ->update([
+                'deleted_at' => now(),
+                'deleted_by' => auth()->id() ?? null,
+            ]);
 
         return redirect()->route('admin.jenishewan.index')->with('success', 'Jenis hewan berhasil dihapus.');
     }
@@ -149,6 +155,18 @@ class JenisHewanController extends Controller
         return DB::table('jenis_hewan')->insert([
             'nama_jenis_hewan' => $this->formatNamaJenisHewan($data['nama_jenis_hewan']),
         ]);
+    }
+
+    /**
+     * Restore a soft-deleted jenis_hewan
+     */
+    public function restore($idjenis_hewan)
+    {
+        DB::table('jenis_hewan')->where('idjenis_hewan', $idjenis_hewan)->update([
+            'deleted_at' => null,
+            'deleted_by' => null,
+        ]);
+        return redirect()->route('admin.jenishewan.index')->with('success', 'Jenis hewan restored successfully.');
     }
 
     /**
