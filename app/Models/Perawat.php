@@ -1,14 +1,14 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\IsDeletedFlag;
 use App\Models\DataUser;
 
 class Perawat extends Model
 {
-    use HasFactory;
+    use HasFactory, IsDeletedFlag;
 
     protected $table = 'perawat';
     protected $primaryKey = 'id_perawat';

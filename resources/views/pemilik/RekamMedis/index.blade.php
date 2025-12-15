@@ -47,6 +47,7 @@
                                     <th>Temuan Klinis</th>
                                     <th>Diagnosa</th>
                                     <th>Dokter Pemeriksa</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -62,10 +63,13 @@
                                         <td>{{ \Illuminate\Support\Str::limit($rm->temuan_klinis, 50) }}</td>
                                         <td>{{ \Illuminate\Support\Str::limit($rm->diagnosa, 50) }}</td>
                                         <td>{{ $rm->roleUser->user->nama ?? 'N/A' }}</td>
+                                        <td>
+                                            <a href="{{ route('pemilik.rekammedis.show', $rm->idrekam_medis) }}" class="btn btn-sm btn-info">Lihat</a>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center">Tidak ada data rekam medis.</td>
+                                        <td colspan="8" class="text-center">Tidak ada data rekam medis.</td>
                                     </tr>
                                 @endforelse
                             </tbody>

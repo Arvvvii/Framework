@@ -128,13 +128,22 @@ Route::middleware(['auth', 'dokter'])->group(function () {
     Route::resource('dokter/pasien', \App\Http\Controllers\Dokter\PasienController::class, ['as' => 'dokter'])->only(['index']);
     Route::get('/dokter/rekammedis/{pet}', [DokterRekamMedisController::class, 'index'])->name('dokter.rekammedis.index');
     Route::resource('dokter/rekammedis.detail', \App\Http\Controllers\Dokter\DetailRekamMedisController::class, ['as' => 'dokter'])->parameters(['rekammedis' => 'rekamMedis'])->only(['index', 'show', 'create', 'store', 'edit', 'update', 'destroy']);
-    Route::resource('dokter/profil', \App\Http\Controllers\Dokter\ProfilController::class, ['as' => 'dokter'])->only(['index']);
+    // Profil Dokter: index, edit, update
+    Route::get('/dokter/profil', [\App\Http\Controllers\Dokter\ProfilController::class, 'index'])->name('dokter.profil.index');
+    Route::get('/dokter/profil/edit', [\App\Http\Controllers\Dokter\ProfilController::class, 'edit'])->name('dokter.profil.edit');
+    Route::put('/dokter/profil', [\App\Http\Controllers\Dokter\ProfilController::class, 'update'])->name('dokter.profil.update');
 });
 
 Route::middleware(['auth', 'pemilik'])->group(function () {
     Route::get('/pemilik/dashboard', [PemilikDashboardController::class, 'index'])->name('pemilik.dashboard');
     Route::get('/pemilik/pet', [PemilikPetController::class, 'index'])->name('pemilik.pet.index');
+    // Profil Pemilik: index, edit, update
+    Route::get('/pemilik/profil', [\App\Http\Controllers\Pemilik\ProfilController::class, 'index'])->name('pemilik.profil.index');
+    Route::get('/pemilik/profil/edit', [\App\Http\Controllers\Pemilik\ProfilController::class, 'edit'])->name('pemilik.profil.edit');
+    Route::put('/pemilik/profil', [\App\Http\Controllers\Pemilik\ProfilController::class, 'update'])->name('pemilik.profil.update');
     Route::get('/pemilik/rekammedis', [PemilikRekamMedisController::class, 'index'])->name('pemilik.rekammedis.index');
+    Route::get('/pemilik/rekammedis/{rekamMedis}', [PemilikRekamMedisController::class, 'show'])
+        ->name('pemilik.rekammedis.show');
     Route::get('/pemilik/reservasi', [PemilikReservasiController::class, 'index'])->name('pemilik.reservasi.index');
 });
 
@@ -157,7 +166,10 @@ Route::middleware(['auth', 'perawat'])->group(function () {
     // Note: Perawat does not have a dedicated Tindakan Terapi page (list view removed).
 
     // Profil perawat (index only)
-    Route::resource('perawat/profil', \App\Http\Controllers\Perawat\ProfilController::class, ['as' => 'perawat'])->only(['index']);
+    // Profil Perawat: index, edit, update
+    Route::get('/perawat/profil', [\App\Http\Controllers\Perawat\ProfilController::class, 'index'])->name('perawat.profil.index');
+    Route::get('/perawat/profil/edit', [\App\Http\Controllers\Perawat\ProfilController::class, 'edit'])->name('perawat.profil.edit');
+    Route::put('/perawat/profil', [\App\Http\Controllers\Perawat\ProfilController::class, 'update'])->name('perawat.profil.update');
 
     // Resource routes for Rekam Medis (perawat) - allow CRUD except index/show handled above
     Route::resource('perawat/rekammedis', PerawatRekamMedisController::class, ['as' => 'perawat'])->parameters(['rekammedis' => 'rekamMedis'])->except(['index', 'show']);

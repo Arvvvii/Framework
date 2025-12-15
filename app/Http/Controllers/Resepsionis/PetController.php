@@ -28,7 +28,7 @@ class PetController extends Controller
     public function create()
     {
         $pemilik = Pemilik::with('user')->get();
-        $rasHewan = RasHewan::all();
+        $rasHewan = RasHewan::whereNull('deleted_at')->get();
         return view('resepsionis.Pet.create', compact('pemilik', 'rasHewan'));
     }
 
@@ -65,7 +65,7 @@ class PetController extends Controller
     {
         $pet = Pet::findOrFail($id);
         $pemilik = Pemilik::with('user')->get();
-        $rasHewan = RasHewan::all();
+        $rasHewan = RasHewan::whereNull('deleted_at')->get();
         return view('resepsionis.Pet.edit', compact('pet', 'pemilik', 'rasHewan'));
     }
 

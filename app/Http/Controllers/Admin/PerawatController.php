@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Perawat;
 use App\Models\DataUser;
+use App\Models\RoleUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class PerawatController extends Controller
 {
@@ -32,17 +35,68 @@ class PerawatController extends Controller
      */
     public function store(Request $request)
     {
+        // Base validation for Perawat fields
         $request->validate([
-            'id_user' => 'required|unique:perawat,id_user',
             'alamat' => 'required',
             'no_hp' => 'required',
             'jenis_kelamin' => 'required|in:L,P',
             'pendidikan' => 'required'
         ]);
 
-        Perawat::create($request->all());
+        return DB::transaction(function () use ($request) {
+            $userId = null;
 
-        return redirect()->route('admin.perawat.index')->with('success', 'Data perawat berhasil ditambahkan');
+            if ($request->boolean('create_user')) {
+                // Validate and create a new DataUser
+                $validatedUser = $request->validate([
+                    'nama' => 'required|string|max:255',
+                    'email' => 'required|email|max:255|unique:user,email',
+                    'password' => 'required|string|min:6|confirmed',
+                ]);
+
+                $newUser = DataUser::create([
+                    'nama' => $validatedUser['nama'],
+                    'email' => $validatedUser['email'],
+                    'password' => Hash::make($validatedUser['password']),
+                ]);
+                $userId = $newUser->iduser;
+
+                // Assign Role: Perawat (idrole = 3)
+                RoleUser::create([
+                    'iduser' => $userId,
+                    'idrole' => 3,
+                    'status' => 1,
+                ]);
+            } else {
+                // Using existing user
+                $request->validate([
+                    'id_user' => 'required|unique:perawat,id_user',
+                ]);
+                $userId = (int) $request->input('id_user');
+
+                // Ensure the selected user has Perawat role; if missing, create it
+                $hasRole = RoleUser::where('iduser', $userId)
+                    ->where('idrole', 3)
+                    ->exists();
+                if (!$hasRole) {
+                    RoleUser::create([
+                        'iduser' => $userId,
+                        'idrole' => 3,
+                        'status' => 1,
+                    ]);
+                }
+            }
+
+            Perawat::create([
+                'alamat' => $request->input('alamat'),
+                'no_hp' => $request->input('no_hp'),
+                'jenis_kelamin' => $request->input('jenis_kelamin'),
+                'pendidikan' => $request->input('pendidikan'),
+                'id_user' => $userId,
+            ]);
+
+            return redirect()->route('admin.perawat.index')->with('success', 'Data perawat berhasil ditambahkan');
+        });
     }
 
     /**

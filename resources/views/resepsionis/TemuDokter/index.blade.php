@@ -47,7 +47,7 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Tanggal</th>
-                                    <th>Keluhan</th>
+                                    <th>Status</th>
                                     <th>Nama Hewan</th>
                                     <th>Pemilik</th>
                                     <th>Ras Hewan</th>
@@ -64,9 +64,16 @@
                                         </td>
                                         <td>
                                             @php
-                                                $kel = $td->keluhan ?? optional($td->rekamMedis->first())->anamnesa;
+                                                $statusLabel = [
+                                                    '1' => ['Menunggu', 'warning'],
+                                                    '2' => ['Selesai', 'success'],
+                                                    '3' => ['Batal', 'danger'],
+                                                ];
+                                                $status = $td->status;
+                                                $label = $statusLabel[$status][0] ?? 'Tidak Diketahui';
+                                                $class = $statusLabel[$status][1] ?? 'secondary';
                                             @endphp
-                                            {{ \Illuminate\Support\Str::limit($kel ?? 'N/A', 50) }}
+                                            <span class="badge bg-{{ $class }}">{{ $label }}</span>
                                         </td>
                                         <td>{{ $td->pet->nama ?? 'N/A' }}</td>
                                         <td>{{ $td->pet->pemilik->user->nama ?? 'N/A' }}</td>

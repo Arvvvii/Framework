@@ -41,6 +41,7 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
+                                    <th>No. Urut</th>
                                     <th>Waktu Reservasi</th>
                                     <th>Nama Pet</th>
                                     <th>Ras Hewan</th>
@@ -52,6 +53,7 @@
                                 @forelse($reservasi as $res)
                                     <tr>
                                         <td>{{ $res->idreservasi_dokter }}</td>
+                                        <td>{{ $res->no_urut ?? '-' }}</td>
                                         <td>
                                             {{ $res->waktu_daftar?->format('d-m-Y H:i') ?? 'N/A' }}<br>
                                             <small class="text-muted">{{ $res->waktu_daftar?->diffForHumans() }}</small>

@@ -1,13 +1,13 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\IsDeletedFlag;
 
 class KodeTindakanTerapi extends Model
 {
-    use HasFactory;
+    use HasFactory, IsDeletedFlag;
 
     /**
      * The table associated with the model.

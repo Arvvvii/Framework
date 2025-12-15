@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\TemuDokter;
 use App\Models\Pet;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 class TemuDokterController extends Controller
 {
@@ -26,7 +28,9 @@ class TemuDokterController extends Controller
     public function create()
     {
         $pets = Pet::with('pemilik.user', 'rasHewan')->get();
-        return view('resepsionis.TemuDokter.create', compact('pets'));
+        // Ambil semua role_user yang merupakan dokter (idrole = 2) beserta relasi user
+        $dokters = \App\Models\RoleUser::with('user')->where('idrole', 2)->where('status', 1)->get();
+        return view('resepsionis.TemuDokter.create', compact('pets', 'dokters'));
     }
 
     /**
@@ -37,20 +41,26 @@ class TemuDokterController extends Controller
         $request->validate([
             'id_pet' => 'required|exists:pet,idpet',
             'waktu_daftar' => 'required|date',
-            // 'keluhan' is optional because DB may not have the column
-            'keluhan' => 'nullable|string',
+            // wajib pilih dokter aktif (role=2, status=1)
+            'idrole_user_dokter' => [
+                'required',
+                Rule::exists('role_user', 'idrole_user')->where(function($q){
+                    $q->where('idrole', 2)->where('status', 1);
+                }),
+            ],
         ]);
 
-        // Determine current user's role_user id to store as idrole_user
-        $roleUser = auth()->user()->roleUsers()->first();
+        // hitung nomor urut per tanggal reservasi (berdasarkan tanggal di waktu_daftar)
+        $tanggal = Carbon::parse($request->waktu_daftar)->format('Y-m-d');
+        $maxUrut = TemuDokter::whereDate('waktu_daftar', $tanggal)->max('no_urut');
+        $nextNoUrut = (int)($maxUrut ?? 0) + 1;
 
         TemuDokter::create([
             'idpet' => $request->id_pet,
             'waktu_daftar' => $request->waktu_daftar,
-            'idrole_user' => $roleUser->idrole_user ?? null,
+            'idrole_user' => $request->idrole_user_dokter,
+            'no_urut' => $nextNoUrut,
             'status' => '1', // default to '1' (Menunggu)
-            // Note: we intentionally do NOT persist 'keluhan' here because the
-            // `temu_dokter` table in some environments doesn't have that column.
         ]);
 
         return redirect()->route('resepsionis.temudokter.index')->with('success', 'Temu dokter berhasil dibuat!');

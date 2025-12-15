@@ -4,11 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-// Hapus atau jadikan komentar semua import Model
-// use App\Models\DataUser;
-// use App\Models\Role;
-// use App\Models\Pet;
-// ... dan Model lainnya
 use Illuminate\Support\Facades\DB; // PENTING: Hanya butuh DB
 
 class DashboardController extends Controller

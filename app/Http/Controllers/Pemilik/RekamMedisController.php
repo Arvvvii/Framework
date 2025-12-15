@@ -33,4 +33,21 @@ class RekamMedisController extends Controller
         
         return view('pemilik.RekamMedis.index', compact('rekamMedis'));
     }
+
+    /**
+     * Tampilkan satu rekam medis milik pemilik yang sedang login.
+     */
+    public function show($rekamMedisId)
+    {
+        $userId = session('user_id');
+        $pemilik = Pemilik::where('iduser', $userId)->firstOrFail();
+
+        $rekamMedis = RekamMedis::with('temuDokter.pet.pemilik.user', 'detailRekamMedis.kodeTindakanTerapi', 'roleUser.user')
+            ->whereHas('temuDokter.pet', function($q) use ($pemilik){
+                $q->where('idpemilik', $pemilik->idpemilik);
+            })
+            ->findOrFail($rekamMedisId);
+
+        return view('pemilik.RekamMedis.show', compact('rekamMedis'));
+    }
 }

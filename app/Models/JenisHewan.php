@@ -1,13 +1,13 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\IsDeletedFlag;
 
 class JenisHewan extends Model
 {
-    use HasFactory;
+    use HasFactory, IsDeletedFlag;
 
     /**
      * The table does not have `created_at`/`updated_at` columns in the schema dump.

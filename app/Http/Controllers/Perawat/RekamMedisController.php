@@ -30,10 +30,11 @@ class RekamMedisController extends Controller
         // Also load reservations (temu_dokter) for pets that never had any rekam_medis
         // This prevents showing 'Buat Rekam Medis' for pets that already have at least one rekam_medis
         $newReservations = TemuDokter::with('pet.pemilik.user', 'pet.rasHewan')
+            ->where('status', 1) // hanya reservasi menunggu
             ->whereDoesntHave('pet.rekamMedis')
-            // only show reservations created by resepsionis (role id 4)
+            // hanya reservasi yang menunjuk RoleUser dokter aktif (idrole=2, status=1)
             ->whereHas('roleUser', function($q){
-                $q->where('idrole', 4);
+                $q->where('idrole', 2)->where('status', 1);
             })
             ->orderBy('waktu_daftar', 'desc')
             ->get()
@@ -59,7 +60,13 @@ class RekamMedisController extends Controller
      */
     public function create(Request $request)
     {
-        $temuDokters = TemuDokter::with('pet.pemilik.user')->get();
+        // Hanya tampilkan reservasi dengan RoleUser dokter aktif
+        $temuDokters = TemuDokter::with('pet.pemilik.user')
+            ->where('status', 1)
+            ->whereHas('roleUser', function($q){
+                $q->where('idrole', 2)->where('status', 1);
+            })
+            ->get();
 
         // allow preselecting a reservation via query param ?idreservasi=123
         $selectedReservasi = $request->query('idreservasi');
@@ -82,9 +89,14 @@ class RekamMedisController extends Controller
             'diagnosa' => 'nullable|string',
         ]);
 
-        // determine doctor assigned to the selected reservation (if any)
-        $temu = \App\Models\TemuDokter::find($request->input('idreservasi_dokter'));
+        // Tentukan dokter yang ditugaskan pada reservasi
+        $temu = \App\Models\TemuDokter::with('roleUser.role')->find($request->input('idreservasi_dokter'));
         $assignedDoctorRoleUserId = $temu->idrole_user ?? null;
+
+        // Validasi: pastikan role yang ditugaskan adalah DOKTER (idrole = 2)
+        if ($assignedDoctorRoleUserId && optional($temu->roleUser)->idrole !== 2) {
+            return back()->withInput()->with('error', 'Reservasi ini tidak menunjuk RoleUser dokter yang valid. Mohon pilih reservasi dengan dokter (role id = 2).');
+        }
 
         try {
             $rekam = RekamMedis::create([
@@ -92,14 +104,17 @@ class RekamMedisController extends Controller
                 'anamnesa' => $request->input('anamnesa'),
                 'temuan_klinis' => $request->input('temuan_klinis'),
                 'diagnosa' => $request->input('diagnosa'),
-                // assign the dokter_pemeriksa based on the reservation's assigned role_user (doctor),
-                // do NOT use the currently authenticated perawat's role_user id here.
                 'dokter_pemeriksa' => $assignedDoctorRoleUserId,
             ]);
 
+            // Update status temu_dokter menjadi 'Selesai' (3)
+            if ($temu) {
+                $temu->status = 3;
+                $temu->save();
+            }
+
             return redirect()->route('perawat.rekammedis.index')->with('success', 'Rekam medis berhasil dibuat.');
         } catch (\Exception $e) {
-            // Log the error and show a friendly message with the actual DB error for debugging
             \Log::error('Gagal membuat rekam medis: ' . $e->getMessage());
             return back()->withInput()->with('error', 'Gagal menambahkan rekam medis: ' . $e->getMessage());
         }
@@ -111,7 +126,13 @@ class RekamMedisController extends Controller
     public function edit($rekamMedisId)
     {
         $rekamMedis = RekamMedis::findOrFail($rekamMedisId);
-        $temuDokters = TemuDokter::with('pet.pemilik.user')->get();
+        // Dropdown reservasi juga dibatasi ke dokter aktif
+        $temuDokters = TemuDokter::with('pet.pemilik.user')
+            ->where('status', 1)
+            ->whereHas('roleUser', function($q){
+                $q->where('idrole', 2)->where('status', 1);
+            })
+            ->get();
         return view('perawat.RekamMedis.edit', compact('rekamMedis', 'temuDokters'));
     }
 

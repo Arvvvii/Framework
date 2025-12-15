@@ -50,6 +50,21 @@
                             </div>
 
                             <div class="mb-3">
+                                <label for="idrole_user_dokter" class="form-label">Pilih Dokter Pemeriksa <span class="text-danger">*</span></label>
+                                <select name="idrole_user_dokter" id="idrole_user_dokter" class="form-select @error('idrole_user_dokter') is-invalid @enderror" required>
+                                    <option value="">-- Pilih Dokter --</option>
+                                    @foreach($dokters as $dokter)
+                                        <option value="{{ $dokter->idrole_user }}" {{ old('idrole_user_dokter') == $dokter->idrole_user ? 'selected' : '' }}>
+                                            {{ $dokter->user->nama ?? 'N/A' }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('idrole_user_dokter')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3">
                                 <label for="waktu_daftar" class="form-label">Waktu Janji Temu <span class="text-danger">*</span></label>
                                 <input type="datetime-local" name="waktu_daftar" id="waktu_daftar" value="{{ old('waktu_daftar') }}" class="form-control @error('waktu_daftar') is-invalid @enderror" required>
                                 @error('waktu_daftar')
@@ -57,13 +72,7 @@
                                 @enderror
                             </div>
 
-                            <div class="mb-3">
-                                <label for="keluhan" class="form-label">Keluhan <span class="text-danger">*</span></label>
-                                <textarea name="keluhan" id="keluhan" rows="4" class="form-control @error('keluhan') is-invalid @enderror" required placeholder="Tuliskan keluhan pet...">{{ old('keluhan') }}</textarea>
-                                @error('keluhan')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                            <!-- Kolom keluhan dihapus sesuai permintaan -->
                         </div>
                         <div class="card-footer">
                             <button type="submit" class="btn btn-warning">

@@ -25,6 +25,12 @@
                 <h3 class="card-title">Profil Dokter</h3>
             </div>
             <div class="card-body">
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
                 <dl class="row">
                     <dt class="col-sm-3">Nama</dt>
                     <dd class="col-sm-9">{{ optional($dokter->user)->nama ?? '-' }}</dd>
@@ -37,6 +43,7 @@
                     <dt class="col-sm-3">Spesialisasi</dt>
                     <dd class="col-sm-9">{{ $dokter->bidang_dokter ?? '-' }}</dd>
                 </dl>
+                <a href="{{ route('dokter.profil.edit') }}" class="btn btn-primary">Edit Profil</a>
             </div>
         </div>
     </div>

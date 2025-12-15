@@ -1,6 +1,6 @@
-@extends('layouts.perawat.main')
+@extends('layouts.pemilik.main')
 
-@section('title', 'Profil Perawat')
+@section('title', 'Profil Saya')
 
 @section('content')
 <div class="app-content-header">
@@ -11,7 +11,7 @@
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-end">
-                    <li class="breadcrumb-item"><a href="{{ route('perawat.dashboard') }}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('pemilik.dashboard') }}">Home</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Profil</li>
                 </ol>
             </div>
@@ -21,9 +21,7 @@
 <div class="app-content">
     <div class="container-fluid">
         <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Profil Perawat</h3>
-            </div>
+            <div class="card-header"><h3 class="card-title">Profil Pemilik</h3></div>
             <div class="card-body">
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -33,17 +31,15 @@
                 @endif
                 <dl class="row">
                     <dt class="col-sm-3">Nama</dt>
-                    <dd class="col-sm-9">{{ optional(optional($perawat)->user)->nama ?? '-' }}</dd>
+                    <dd class="col-sm-9">{{ optional($pemilik->user)->nama ?? '-' }}</dd>
                     <dt class="col-sm-3">Email</dt>
-                    <dd class="col-sm-9">{{ optional(optional($perawat)->user)->email ?? '-' }}</dd>
-                    <dt class="col-sm-3">Telepon</dt>
-                    <dd class="col-sm-9">{{ optional($perawat)->no_hp ?? '-' }}</dd>
+                    <dd class="col-sm-9">{{ optional($pemilik->user)->email ?? '-' }}</dd>
+                    <dt class="col-sm-3">No. WA</dt>
+                    <dd class="col-sm-9">{{ $pemilik->no_wa ?? '-' }}</dd>
                     <dt class="col-sm-3">Alamat</dt>
-                    <dd class="col-sm-9">{{ optional($perawat)->alamat ?? '-' }}</dd>
-                    <dt class="col-sm-3">Pendidikan</dt>
-                    <dd class="col-sm-9">{{ optional($perawat)->pendidikan ?? '-' }}</dd>
+                    <dd class="col-sm-9">{{ $pemilik->alamat ?? '-' }}</dd>
                 </dl>
-                <a href="{{ route('perawat.profil.edit') }}" class="btn btn-primary">Edit Profil</a>
+                <a href="{{ route('pemilik.profil.edit') }}" class="btn btn-primary">Edit Profil</a>
             </div>
         </div>
     </div>

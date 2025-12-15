@@ -8,6 +8,8 @@ use App\Models\DataUser; // Tetap diperlukan untuk create/edit form
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB; // PENTING: Import DB
+use Illuminate\Support\Facades\Hash;
+use App\Models\RoleUser;
 
 class PemilikController extends Controller
 {
@@ -41,22 +43,71 @@ class PemilikController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        // Always validate base fields first
+        $baseValidator = Validator::make($request->all(), [
             'no_wa' => 'required|string|max:255',
             'alamat' => 'required|string|max:255',
-            'iduser' => 'required|exists:user,iduser', // Perhatikan nama tabel di exists
         ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+        if ($baseValidator->fails()) {
+            return redirect()->back()->withErrors($baseValidator)->withInput();
         }
 
-        // GANTI: Pemilik::create($request->only([...]));
-        DB::table('pemilik')->insert($request->only(['no_wa', 'alamat', 'iduser']));
+        return DB::transaction(function () use ($request) {
+            $iduser = null;
 
-        return redirect()->route('admin.pemilik.index')->with('success', 'Pemilik created successfully.');
+            if ($request->boolean('create_user')) {
+                // Validate and create new DataUser
+                $userValidator = Validator::make($request->all(), [
+                    'nama' => 'required|string|max:255',
+                    'email' => 'required|email|max:255|unique:user,email',
+                    'password' => 'required|string|min:6|confirmed',
+                ]);
+                if ($userValidator->fails()) {
+                    return redirect()->back()->withErrors($userValidator)->withInput();
+                }
+
+                $newUser = DataUser::create([
+                    'nama' => $request->input('nama'),
+                    'email' => $request->input('email'),
+                    'password' => Hash::make($request->input('password')),
+                ]);
+                $iduser = $newUser->iduser;
+
+                // Assign Role: Pemilik (idrole = 5)
+                RoleUser::create([
+                    'iduser' => $iduser,
+                    'idrole' => 5,
+                    'status' => 1,
+                ]);
+            } else {
+                // Validate existing user selection
+                $selectValidator = Validator::make($request->all(), [
+                    'iduser' => 'required|exists:user,iduser',
+                ]);
+                if ($selectValidator->fails()) {
+                    return redirect()->back()->withErrors($selectValidator)->withInput();
+                }
+                $iduser = (int) $request->input('iduser');
+
+                // Ensure user has Pemilik role
+                $hasRole = RoleUser::where('iduser', $iduser)->where('idrole', 5)->exists();
+                if (!$hasRole) {
+                    RoleUser::create([
+                        'iduser' => $iduser,
+                        'idrole' => 5,
+                        'status' => 1,
+                    ]);
+                }
+            }
+
+            DB::table('pemilik')->insert([
+                'no_wa' => $request->input('no_wa'),
+                'alamat' => $request->input('alamat'),
+                'iduser' => $iduser,
+            ]);
+
+            return redirect()->route('admin.pemilik.index')->with('success', 'Pemilik created successfully.');
+        });
     }
 
     /**
