@@ -18,7 +18,7 @@ class PetController extends Controller
      */
     public function index()
     {
-        $pets = Pet::with('pemilik.user', 'rasHewan')->get();
+        $pets = Pet::with('pemilik.user', 'rasHewan.jenisHewan')->get();
         return view('resepsionis.Pet.index', compact('pets'));
     }
 

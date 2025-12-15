@@ -32,7 +32,7 @@
                             </div>
                         </div>
 
-                        <div id="existingUserSection" class="mb-3">
+                        <div id="existingUserSection" class="mb-3" style="display: {{ old('create_user') ? 'none' : 'block' }};">
                             <label for="id_user" class="form-label">Pilih User <span class="text-danger">*</span></label>
                             <select class="form-select @error('id_user') is-invalid @enderror" id="id_user" name="id_user">
                                 <option value="">-- Pilih User --</option>
@@ -47,7 +47,7 @@
                             @enderror
                         </div>
 
-                        <div id="newUserSection" class="mb-3" style="display:none;">
+                        <div id="newUserSection" class="mb-3" style="display: {{ old('create_user') ? 'block' : 'none' }};">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label for="nama" class="form-label">Nama</label>
@@ -139,19 +139,27 @@
 
 @push('scripts')
 <script>
-    function toggleUserSections() {
-        const create = document.getElementById('create_user').checked;
-        document.getElementById('existingUserSection').style.display = create ? 'none' : 'block';
-        document.getElementById('newUserSection').style.display = create ? 'block' : 'none';
-        // toggle requireds
-        document.getElementById('id_user').required = !create;
-        ['nama','email','password','password_confirmation'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.required = create;
-        });
-    }
-    document.getElementById('create_user').addEventListener('change', toggleUserSections);
-    // Initialize on load based on old()
-    toggleUserSections();
-}</script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function toggleUserSections() {
+            const create = document.getElementById('create_user').checked;
+            const existing = document.getElementById('existingUserSection');
+            const newer = document.getElementById('newUserSection');
+            if (existing && newer) {
+                existing.style.display = create ? 'none' : 'block';
+                newer.style.display = create ? 'block' : 'none';
+            }
+            const idSel = document.getElementById('id_user');
+            if (idSel) idSel.required = !create;
+            ['nama','email','password','password_confirmation'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.required = create;
+            });
+        }
+        const chk = document.getElementById('create_user');
+        if (chk) {
+            chk.addEventListener('change', toggleUserSections);
+            toggleUserSections();
+        }
+    });
+</script>
 @endpush

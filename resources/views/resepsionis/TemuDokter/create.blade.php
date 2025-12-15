@@ -65,11 +65,9 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="waktu_daftar" class="form-label">Waktu Janji Temu <span class="text-danger">*</span></label>
-                                <input type="datetime-local" name="waktu_daftar" id="waktu_daftar" value="{{ old('waktu_daftar') }}" class="form-control @error('waktu_daftar') is-invalid @enderror" required>
-                                @error('waktu_daftar')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <label class="form-label">Waktu Janji Temu</label>
+                                <input type="text" class="form-control" value="Otomatis (sekarang) saat disimpan" disabled>
+                                <div class="form-text">Waktu pendaftaran dan nomor urut ditentukan otomatis ketika Anda menekan tombol Buat Janji.</div>
                             </div>
 
                             <!-- Kolom keluhan dihapus sesuai permintaan -->

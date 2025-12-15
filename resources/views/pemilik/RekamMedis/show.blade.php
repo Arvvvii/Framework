@@ -60,7 +60,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Kode Tindakan/Terapi</th>
-                                        <th>Nama</th>
+                                        <th>Nama/Deskripsi</th>
                                         <th>Keterangan</th>
                                     </tr>
                                 </thead>
@@ -69,8 +69,8 @@
                                     <tr>
                                         <td>{{ $i + 1 }}</td>
                                         <td>{{ $detail->kodeTindakanTerapi->kode ?? '-' }}</td>
-                                        <td>{{ $detail->kodeTindakanTerapi->nama ?? '-' }}</td>
-                                        <td>{{ $detail->keterangan ?? '-' }}</td>
+                                        <td>{{ $detail->kodeTindakanTerapi->deskripsi_tindakan_terapi ?? '-' }}</td>
+                                        <td>{{ $detail->detail ?? '-' }}</td>
                                     </tr>
                                 @empty
                                     <tr>

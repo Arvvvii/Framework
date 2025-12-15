@@ -21,15 +21,20 @@ class DetailRekamMedisController extends Controller
     public function store(Request $request, $rekamMedisId)
     {
         $petId = request('pet');
-        $request->validate([
-            'idkode_tindakan_terapi' => 'required|exists:kode_tindakan_terapi,idkode_tindakan_terapi',
-            'detail' => 'required|string',
+        $validated = $request->validate([
+            'items' => 'required|array|min:1',
+            'items.*.idkode_tindakan_terapi' => 'required|exists:kode_tindakan_terapi,idkode_tindakan_terapi',
+            'items.*.detail' => 'required|string',
         ]);
-        DetailRekamMedis::create([
-            'idrekam_medis' => $rekamMedisId,
-            'idkode_tindakan_terapi' => $request->idkode_tindakan_terapi,
-            'detail' => $request->detail,
-        ]);
+
+        foreach ($validated['items'] as $item) {
+            DetailRekamMedis::create([
+                'idrekam_medis' => $rekamMedisId,
+                'idkode_tindakan_terapi' => $item['idkode_tindakan_terapi'],
+                'detail' => $item['detail'],
+            ]);
+        }
+
         return redirect()->route('dokter.rekammedis.detail.index', [$rekamMedisId, 'pet' => $petId])->with('success', 'Detail tindakan/terapi berhasil ditambahkan!');
     }
 

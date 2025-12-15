@@ -52,6 +52,7 @@
                                     <th>Umur</th>
                                     <th>Warna/Tanda</th>
                                     <th>Pemilik</th>
+                                    <th>Jenis Hewan</th>
                                     <th>Ras Hewan</th>
                                     <th>Aksi</th>
                                 </tr>
@@ -72,6 +73,7 @@
                                         <td>{{ $pet->tanggal_lahir ? $pet->tanggal_lahir->diffForHumans(['parts' => 2]) : 'N/A' }}</td>
                                         <td>{{ \Illuminate\Support\Str::limit($pet->warna_tanda ?? 'N/A', 30) }}</td>
                                         <td>{{ $pet->pemilik->user->nama ?? 'N/A' }}</td>
+                                        <td>{{ $pet->rasHewan->jenisHewan->nama_jenis_hewan ?? 'N/A' }}</td>
                                         <td>{{ $pet->rasHewan->nama_ras ?? 'N/A' }}</td>
                                         <td>
                                             <a href="{{ route('resepsionis.pet.edit', $pet->idpet) }}" class="btn btn-warning btn-sm">
@@ -88,7 +90,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="9" class="text-center">Tidak ada data pet.</td>
+                                        <td colspan="10" class="text-center">Tidak ada data pet.</td>
                                     </tr>
                                 @endforelse
                             </tbody>

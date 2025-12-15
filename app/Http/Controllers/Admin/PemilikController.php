@@ -34,7 +34,8 @@ class PemilikController extends Controller
      */
     public function create()
     {
-        $users = DataUser::all(); // Tetap pakai Eloquent untuk helper data
+        // Tampilkan hanya user yang belum memiliki data Pemilik
+        $users = DataUser::whereDoesntHave('pemilik')->get();
         return view('admin.Pemilik.create', compact('users'));
     }
 
@@ -82,7 +83,7 @@ class PemilikController extends Controller
             } else {
                 // Validate existing user selection
                 $selectValidator = Validator::make($request->all(), [
-                    'iduser' => 'required|exists:user,iduser',
+                    'iduser' => 'required|exists:user,iduser|unique:pemilik,iduser',
                 ]);
                 if ($selectValidator->fails()) {
                     return redirect()->back()->withErrors($selectValidator)->withInput();
